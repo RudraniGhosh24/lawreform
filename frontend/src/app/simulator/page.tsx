@@ -4,7 +4,7 @@ import { AlertTriangle, RotateCcw, ChevronRight } from 'lucide-react'
 import SimulatorScenario from '@/components/simulator/SimulatorScenario'
 import SimulatorResult from '@/components/simulator/SimulatorResult'
 
-export const scenarios = [
+const scenarios = [
   { id: 'road_accident', label: 'Road Accident', icon: '🚗', desc: 'Someone is injured in a crash near you', severity: 'High' },
   { id: 'drowning', label: 'Drowning / Medical Emergency', icon: '🌊', desc: 'Person in water or unconscious', severity: 'Critical' },
   { id: 'fraud', label: 'Fraud / Scam', icon: '💳', desc: 'You or someone is being scammed', severity: 'Medium' },
