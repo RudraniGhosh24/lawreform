@@ -1,9 +1,6 @@
 import React from 'react'
 import SpeechPlayer from './SpeechPlayer'
 
-/**
- * Extract law citations like [Some Act, Year] from text
- */
 function parseCitations(text) {
   const parts = []
   const regex = /\[([^\]]+(?:Act|Code|Scheme|MGNREGA|RTI)[^\]]*)\]/gi
@@ -25,12 +22,8 @@ function parseCitations(text) {
   return parts.length > 0 ? parts : [{ type: 'text', content: text }]
 }
 
-/**
- * Extract next steps from the AI response
- */
 function extractNextSteps(text) {
   const steps = []
-  // Match lines that look like action items
   const patterns = [
     /(?:^|\n)\s*[-•→]\s*(.+(?:gov\.in|DLSA|helpline|form|contact|visit|call|file|register).+)/gi,
     /(?:^|\n)\s*\d+\.\s*(.+(?:gov\.in|DLSA|helpline|form|contact|visit|call|file|register).+)/gi,
@@ -59,17 +52,16 @@ export default function MessageBubble({ message, language, isStreaming }) {
       <div
         className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 ${
           isUser
-            ? 'bg-saffron-500 text-white rounded-br-md'
-            : 'bg-white dark:bg-gray-800 text-charcoal dark:text-offwhite border border-gray-200 dark:border-gray-700 rounded-bl-md'
+            ? 'bg-brand-gradient text-white rounded-br-md'
+            : 'bg-white dark:bg-brand-950 text-text dark:text-brand-100 border border-brand-100 dark:border-brand-800 rounded-bl-md'
         }`}
       >
-        {/* Message content with citation badges */}
         <div className={`text-sm leading-relaxed whitespace-pre-wrap ${isStreaming ? 'streaming-cursor' : ''}`}>
           {parts.map((part, i) =>
             part.type === 'citation' ? (
               <span
                 key={i}
-                className="inline-block bg-saffron-100 dark:bg-saffron-900/30 text-saffron-700 dark:text-saffron-300 text-xs font-medium px-2 py-0.5 rounded-full mx-1"
+                className="inline-block bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 text-xs font-medium px-2 py-0.5 rounded-full mx-1"
               >
                 📜 {part.content}
               </span>
@@ -81,16 +73,16 @@ export default function MessageBubble({ message, language, isStreaming }) {
 
         {/* Next steps cards */}
         {!isUser && !isStreaming && nextSteps.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 space-y-2">
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+          <div className="mt-3 pt-3 border-t border-brand-100 dark:border-brand-800 space-y-2">
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">
               Next Steps
             </p>
             {nextSteps.map((step, i) => (
               <div
                 key={i}
-                className="flex items-start gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 text-xs text-gray-700 dark:text-gray-300"
+                className="flex items-start gap-2 p-2 rounded-lg bg-brand-50 dark:bg-brand-900/20 text-xs text-text dark:text-brand-200"
               >
-                <span className="text-saffron-500 mt-0.5">→</span>
+                <span className="text-brand-500 mt-0.5">→</span>
                 <span>{step}</span>
               </div>
             ))}
@@ -99,7 +91,7 @@ export default function MessageBubble({ message, language, isStreaming }) {
 
         {/* TTS player for AI messages */}
         {!isUser && !isStreaming && message.content && (
-          <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+          <div className="mt-2 pt-2 border-t border-brand-50 dark:border-brand-900">
             <SpeechPlayer text={message.content} language={language} />
           </div>
         )}

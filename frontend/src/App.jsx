@@ -37,12 +37,10 @@ export default function App() {
   const speech = useSpeechRecognition(language)
   const tts = useSpeechSynthesis(language)
 
-  // Apply dark mode class
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
   }, [darkMode])
 
-  // Sync speech transcript to input
   useEffect(() => {
     if (speech.transcript) {
       setInput(speech.transcript)
@@ -58,7 +56,6 @@ export default function App() {
       speech.resetTranscript()
       setInput('')
 
-      // Add user message
       const userMsg = { role: 'user', content: question }
       const aiMsg = { role: 'assistant', content: '' }
       setMessages((prev) => [...prev, userMsg, aiMsg])
@@ -111,7 +108,6 @@ export default function App() {
           }
         }
 
-        // Auto-read response aloud
         if (fullResponse && tts.isSupported) {
           const cleanText = fullResponse.replace(/\[([^\]]+)\]/g, '$1')
           tts.speak(cleanText)
@@ -132,7 +128,7 @@ export default function App() {
         setStreamingIndex(-1)
       }
     },
-    [input, isLoading, language, messages.length, speech, tts, API_URL]
+    [input, isLoading, language, messages.length, speech, tts]
   )
 
   const handleKeyDown = (e) => {
@@ -154,7 +150,7 @@ export default function App() {
   const hasMessages = messages.length > 0
 
   return (
-    <div className="flex flex-col h-screen bg-offwhite dark:bg-charcoal">
+    <div className="flex flex-col h-screen bg-surface dark:bg-[#0f0a1a]">
       <Header
         language={language}
         setLanguage={setLanguage}
@@ -164,7 +160,6 @@ export default function App() {
       />
 
       <main className="flex-1 flex flex-col overflow-hidden max-w-5xl w-full mx-auto">
-        {/* Chat area or welcome screen */}
         {hasMessages ? (
           <ChatWindow
             messages={messages}
@@ -173,20 +168,35 @@ export default function App() {
           />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 gap-6 overflow-y-auto">
+            {/* Badge like lawreformer.com */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-50 dark:bg-brand-900/30 border border-brand-200 dark:border-brand-800">
+              <span className="text-sm">⚖️</span>
+              <span className="text-sm font-medium text-brand-700 dark:text-brand-300">
+                {language === 'Hindi' ? 'AI कानूनी सहायक' : language === 'Bengali' ? 'AI আইনি সহায়ক' : 'AI Legal Rights Assistant'}
+              </span>
+            </div>
+
             <div className="text-center space-y-2">
-              <h2 className="text-2xl sm:text-3xl font-bold text-charcoal dark:text-offwhite">
+              <h2 className="text-3xl sm:text-4xl font-bold text-text dark:text-white">
                 {language === 'Hindi'
-                  ? 'अपने अधिकार जानें'
+                  ? 'अपने अधिकार जानें।'
                   : language === 'Bengali'
-                  ? 'আপনার অধিকার জানুন'
-                  : 'Know Your Rights'}
+                  ? 'আপনার অধিকার জানুন।'
+                  : 'Know Your Rights.'}
               </h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm max-w-md">
+              <p className="text-xl sm:text-2xl font-bold bg-brand-gradient-r bg-clip-text text-transparent">
+                {language === 'Hindi'
+                  ? 'अपनी आवाज़ में पूछें।'
+                  : language === 'Bengali'
+                  ? 'আপনার ভাষায় জিজ্ঞাসা করুন।'
+                  : 'Ask in Your Voice.'}
+              </p>
+              <p className="text-text-muted text-sm max-w-md mx-auto mt-2">
                 {language === 'Hindi'
                   ? 'अपना सवाल बोलें या नीचे से चुनें'
                   : language === 'Bengali'
                   ? 'আপনার প্রশ্ন বলুন বা নীচে থেকে বেছে নিন'
-                  : 'Speak your question or choose from below'}
+                  : 'Speak your question or choose a scenario below'}
               </p>
             </div>
 
@@ -197,7 +207,7 @@ export default function App() {
             />
 
             {speech.isListening && (
-              <p className="text-sm text-saffron-500 animate-pulse" aria-live="polite">
+              <p className="text-sm text-brand-600 animate-pulse" aria-live="polite">
                 {language === 'Hindi'
                   ? '🎙️ सुन रहा हूँ...'
                   : language === 'Bengali'
@@ -211,9 +221,8 @@ export default function App() {
         )}
 
         {/* Input area */}
-        <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3">
-          {/* Disclaimer */}
-          <p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 text-center mb-2 leading-relaxed">
+        <div className="border-t border-brand-100 dark:border-brand-900 bg-white dark:bg-[#0f0a1a] px-4 py-3">
+          <p className="text-[10px] sm:text-xs text-text-light text-center mb-2 leading-relaxed">
             {DISCLAIMER[language]}
           </p>
 
@@ -231,7 +240,7 @@ export default function App() {
                 onKeyDown={handleKeyDown}
                 placeholder={PLACEHOLDER[language]}
                 rows={1}
-                className="w-full resize-none rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-4 py-3 text-sm text-charcoal dark:text-offwhite placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-saffron-500 focus:border-transparent min-h-[48px]"
+                className="w-full resize-none rounded-xl border border-brand-200 dark:border-brand-800 bg-brand-50/50 dark:bg-brand-950 px-4 py-3 text-sm text-text dark:text-white placeholder-text-light focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent min-h-[48px]"
                 aria-label="Type your question"
                 disabled={isLoading}
               />
@@ -240,7 +249,7 @@ export default function App() {
             <button
               onClick={() => handleSubmit()}
               disabled={isLoading || !input.trim()}
-              className="px-4 py-3 rounded-xl bg-saffron-500 text-white font-medium text-sm hover:bg-saffron-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[48px] min-h-[48px]"
+              className="px-4 py-3 rounded-xl bg-brand-gradient text-white font-medium text-sm hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all min-w-[48px] min-h-[48px]"
               aria-label="Send"
             >
               {isLoading ? (

@@ -36,10 +36,10 @@ export default function ScenarioTiles({ language, onSelect }) {
         <button
           key={i}
           onClick={() => onSelect(tile.query)}
-          className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-saffron-400 hover:shadow-md transition-all text-center min-h-[100px]"
+          className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white dark:bg-brand-950 border border-brand-100 dark:border-brand-800 hover:border-brand-400 hover:shadow-md hover:shadow-brand-100 transition-all text-center min-h-[100px]"
         >
           <span className="text-3xl" role="img" aria-hidden="true">{tile.icon}</span>
-          <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 leading-tight">
+          <span className="text-xs sm:text-sm font-medium text-text dark:text-brand-100 leading-tight">
             {tile.label}
           </span>
         </button>

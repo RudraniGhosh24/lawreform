@@ -8,15 +8,15 @@ const LANGUAGES = [
 
 export default function LanguageSelector({ language, setLanguage }) {
   return (
-    <div className="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600" role="radiogroup" aria-label="Select language">
+    <div className="flex rounded-lg overflow-hidden border border-brand-200 dark:border-brand-800" role="radiogroup" aria-label="Select language">
       {LANGUAGES.map((lang) => (
         <button
           key={lang.code}
           onClick={() => setLanguage(lang.code)}
           className={`px-3 py-2 text-sm font-medium transition-colors min-w-[48px] min-h-[44px] ${
             language === lang.code
-              ? 'bg-saffron-500 text-white'
-              : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              ? 'bg-brand-gradient text-white'
+              : 'bg-white dark:bg-brand-950 text-text-muted hover:bg-brand-50 dark:hover:bg-brand-900'
           }`}
           role="radio"
           aria-checked={language === lang.code}

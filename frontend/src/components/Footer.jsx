@@ -2,14 +2,14 @@ import React from 'react'
 
 export default function Footer() {
   return (
-    <footer className="w-full py-4 px-4 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-charcoal">
+    <footer className="w-full py-4 px-4 text-center text-sm text-text-muted border-t border-brand-100 dark:border-brand-900 bg-white dark:bg-[#0f0a1a]">
       <p>
         Built by{' '}
         <a
           href="https://lawreformer.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-saffron-500 hover:underline font-medium"
+          className="text-brand-600 hover:underline font-medium"
         >
           Rudrani Ghosh
         </a>
@@ -18,7 +18,7 @@ export default function Footer() {
           href="https://lawreformer.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-saffron-500 hover:underline"
+          className="text-brand-600 hover:underline"
         >
           lawreformer.com
         </a>

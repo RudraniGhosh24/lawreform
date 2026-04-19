@@ -5,23 +5,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        saffron: {
-          50: '#FFF7F0',
-          100: '#FFEAD9',
-          200: '#FFD4B3',
-          300: '#FFB380',
-          400: '#FF8C4D',
-          500: '#FF6B1A',
-          600: '#E55A0A',
-          700: '#B84500',
-          800: '#8A3300',
-          900: '#5C2200',
+        // lawreformer.com purple theme
+        brand: {
+          50: '#faf5ff',
+          100: '#f3e8ff',
+          200: '#e9d5ff',
+          300: '#d8b4fe',
+          400: '#c084fc',
+          500: '#a855f7',
+          600: '#9333ea',
+          700: '#7c3aed',
+          800: '#6d28d9',
+          900: '#5b21b6',
+          950: '#3b0764',
         },
-        offwhite: '#FAFAF7',
-        charcoal: '#1C1C1E',
+        surface: {
+          DEFAULT: '#faf8ff',
+          card: '#ffffff',
+          muted: '#f5f3ff',
+        },
+        text: {
+          DEFAULT: '#1a1a2e',
+          muted: '#6b7280',
+          light: '#9ca3af',
+        },
       },
       fontFamily: {
-        sans: ['Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Bengali', 'sans-serif'],
+        sans: ['Inter', 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Bengali', 'system-ui', 'sans-serif'],
+      },
+      backgroundImage: {
+        'brand-gradient': 'linear-gradient(135deg, #9333ea, #7c3aed, #6d28d9)',
+        'brand-gradient-r': 'linear-gradient(to right, #a855f7, #7c3aed)',
       },
     },
   },

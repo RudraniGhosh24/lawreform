@@ -9,21 +9,21 @@
 }
 
 body {
-  font-family: 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Bengali', sans-serif;
-  background-color: #FAFAF7;
-  color: #1C1C1E;
+  font-family: 'Inter', 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Bengali', system-ui, sans-serif;
+  background-color: #faf8ff;
+  color: #1a1a2e;
   -webkit-font-smoothing: antialiased;
 }
 
 .dark body {
-  background-color: #1C1C1E;
-  color: #FAFAF7;
+  background-color: #0f0a1a;
+  color: #f0ecf9;
 }
 
 /* Pulsing mic animation */
 @keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(1.5); opacity: 0; }
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(1.6); opacity: 0; }
 }
 
 .mic-pulse::before {
@@ -31,7 +31,7 @@ body {
   position: absolute;
   inset: -8px;
   border-radius: 50%;
-  background: #FF6B1A;
+  background: #9333ea;
   animation: pulse-ring 1.5s ease-out infinite;
 }
 
@@ -44,7 +44,7 @@ body {
 .streaming-cursor::after {
   content: '▊';
   animation: blink 0.8s infinite;
-  color: #FF6B1A;
+  color: #9333ea;
   margin-left: 2px;
 }
 
@@ -56,9 +56,9 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #d8b4fe;
   border-radius: 3px;
 }
 .dark ::-webkit-scrollbar-thumb {
-  background: #444;
+  background: #5b21b6;
 }

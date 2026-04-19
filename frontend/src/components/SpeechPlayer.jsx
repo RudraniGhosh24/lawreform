@@ -7,7 +7,6 @@ export default function SpeechPlayer({ text, language }) {
 
   if (!isSupported) return null
 
-  // Strip citation brackets for cleaner TTS
   const cleanText = text.replace(/\[([^\]]+)\]/g, '$1')
 
   return (
@@ -15,7 +14,7 @@ export default function SpeechPlayer({ text, language }) {
       {!isSpeaking ? (
         <button
           onClick={() => speak(cleanText)}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-saffron-50 dark:bg-saffron-900/20 text-saffron-600 dark:text-saffron-400 text-xs font-medium hover:bg-saffron-100 dark:hover:bg-saffron-900/40 transition-colors min-h-[36px]"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 text-xs font-medium hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors min-h-[36px]"
           aria-label="Read aloud"
         >
           🔊 Listen
@@ -24,14 +23,14 @@ export default function SpeechPlayer({ text, language }) {
         <>
           <button
             onClick={isPaused ? resume : pause}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-saffron-50 dark:bg-saffron-900/20 text-saffron-600 dark:text-saffron-400 text-xs font-medium hover:bg-saffron-100 dark:hover:bg-saffron-900/40 transition-colors min-h-[36px]"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 text-xs font-medium hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors min-h-[36px]"
             aria-label={isPaused ? 'Resume' : 'Pause'}
           >
             {isPaused ? '▶️ Resume' : '⏸️ Pause'}
           </button>
           <button
             onClick={stop}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors min-h-[36px]"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-text-muted text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors min-h-[36px]"
             aria-label="Stop"
           >
             ⏹️ Stop
@@ -39,11 +38,10 @@ export default function SpeechPlayer({ text, language }) {
         </>
       )}
 
-      {/* Speed control */}
       <select
         value={rate}
         onChange={(e) => setRate(parseFloat(e.target.value))}
-        className="text-xs bg-transparent border border-gray-200 dark:border-gray-600 rounded-full px-2 py-1 text-gray-600 dark:text-gray-300 min-h-[36px]"
+        className="text-xs bg-transparent border border-brand-200 dark:border-brand-700 rounded-full px-2 py-1 text-text-muted min-h-[36px]"
         aria-label="Speech speed"
       >
         <option value={0.75}>0.75×</option>
