@@ -6,7 +6,7 @@ export default function Header({ language, setLanguage, onAboutClick, darkMode, 
 
   return (
     <>
-      {/* Floating menu button — always visible, top-left */}
+      {/* Floating menu button — top-left only */}
       <button
         onClick={() => setMenuOpen(true)}
         className="fixed top-3 left-3 z-50 p-2 rounded-xl bg-white/90 dark:bg-[#0f0a1a]/90 backdrop-blur border border-brand-200 dark:border-brand-800 shadow-md hover:shadow-lg transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"
@@ -15,29 +15,26 @@ export default function Header({ language, setLanguage, onAboutClick, darkMode, 
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-600"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
 
-      {/* Floating language + dark mode — top-right */}
-      <div className="fixed top-3 right-3 z-50 flex items-center gap-1.5">
-        <LanguageSelector language={language} setLanguage={setLanguage} />
-        <button onClick={() => setDarkMode(!darkMode)}
-          className="p-2 rounded-xl bg-white/90 dark:bg-[#0f0a1a]/90 backdrop-blur border border-brand-200 dark:border-brand-800 shadow-md hover:shadow-lg transition-all min-w-[40px] min-h-[40px] flex items-center justify-center text-sm"
-          aria-label={darkMode ? 'Light mode' : 'Dark mode'}>
-          {darkMode ? '☀️' : '🌙'}
-        </button>
-      </div>
-
-      {/* Side menu overlay */}
+      {/* Side menu */}
       {menuOpen && (
         <div className="fixed inset-0 z-[100] flex" onClick={() => setMenuOpen(false)}>
           <div className="absolute inset-0 bg-black/40" />
-          <nav
-            className="relative w-64 max-w-[80vw] bg-white dark:bg-[#0f0a1a] h-full shadow-xl flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <nav className="relative w-64 max-w-[80vw] bg-white dark:bg-[#0f0a1a] h-full shadow-xl flex flex-col" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between px-4 py-3 border-b border-brand-100 dark:border-brand-900">
               <a href="https://lawreformer.com" className="font-bold text-text dark:text-white flex items-center gap-1.5">
-                <span>⚖️</span> LawReformer <span className="bg-gradient-to-r from-brand-500 to-brand-700 bg-clip-text text-transparent">AI</span>
+                ⚖️ LawReformer <span className="bg-gradient-to-r from-brand-500 to-brand-700 bg-clip-text text-transparent">AI</span>
               </a>
-              <button onClick={() => setMenuOpen(false)} className="p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-950 text-text-muted" aria-label="Close menu">✕</button>
+              <button onClick={() => setMenuOpen(false)} className="p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-950 text-text-muted" aria-label="Close">✕</button>
+            </div>
+
+            {/* Language + Dark mode inside menu */}
+            <div className="px-4 py-3 border-b border-brand-100 dark:border-brand-900 flex items-center justify-between">
+              <LanguageSelector language={language} setLanguage={setLanguage} />
+              <button onClick={() => setDarkMode(!darkMode)}
+                className="p-2 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-950 text-sm"
+                aria-label={darkMode ? 'Light mode' : 'Dark mode'}>
+                {darkMode ? '☀️' : '🌙'}
+              </button>
             </div>
 
             <div className="flex-1 py-2 overflow-y-auto">
