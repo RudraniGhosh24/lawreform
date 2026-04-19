@@ -181,7 +181,7 @@ export default function Home() {
 
               {/* Avatar + Mic button with live transcription */}
               <div className="flex flex-col items-center gap-3">
-                <Avatar isSpeaking={tts.isSpeaking} size={140} />
+                <Avatar isSpeaking={tts.isSpeaking} size={220} />
                 <VoiceButton isListening={speech.isListening} onToggle={handleMicToggle} isSupported={speech.isSupported} />
                 {speech.isListening && (
                   <div className="text-center max-w-sm">

@@ -52,7 +52,7 @@ export default function MessageBubble({ message, language, isStreaming }) {
       {/* Avatar for AI messages */}
       {!isUser && (
         <div className="flex-shrink-0 mr-2 mt-1 hidden sm:block">
-          <Avatar isSpeaking={isStreaming} size={44} />
+          <Avatar isSpeaking={isStreaming} size={48} />
         </div>
       )}
       <div className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-3 ${
