@@ -84,7 +84,17 @@ export default function Home() {
               const data = JSON.parse(line.slice(6))
               if (data.token) {
                 fullResponse += data.token
-                setMessages(prev => { const u = [...prev]; u[u.length - 1] = { role: 'assistant', content: fullResponse }; return u })
+                // Typewriter effect — reveal characters gradually
+                const text = fullResponse
+                let charIndex = 0
+                const typewrite = () => {
+                  if (charIndex <= text.length) {
+                    setMessages(prev => { const u = [...prev]; u[u.length - 1] = { role: 'assistant', content: text.slice(0, charIndex) }; return u })
+                    charIndex += Math.floor(Math.random() * 3) + 2 // 2-4 chars at a time
+                    setTimeout(typewrite, 15)
+                  }
+                }
+                typewrite()
               }
             } catch {}
           }
@@ -118,16 +128,11 @@ export default function Home() {
 
         <main className="flex-1 flex flex-col overflow-hidden max-w-5xl w-full mx-auto">
           {hasMessages ? (
-            /* ===== CHAT VIEW — avatar big on side (desktop) or top (mobile) ===== */
+            /* ===== CHAT VIEW — single big avatar on side (desktop), top (mobile) ===== */
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-              {/* Avatar panel — big during conversation */}
-              <div className="hidden md:flex flex-col items-center justify-start pt-6 px-4 w-[200px] flex-shrink-0">
-                <Avatar isSpeaking={tts.isSpeaking} size={160} />
-              </div>
-              {/* Mobile: small avatar bar */}
-              <div className="md:hidden flex items-center gap-2 px-4 py-2 border-b border-brand-100 dark:border-brand-900">
-                <Avatar isSpeaking={tts.isSpeaking} size={40} />
-                <span className="text-xs text-text-muted">{tts.isSpeaking ? '🗣️ Speaking...' : '⚖️ Lawreformer AI'}</span>
+              {/* Avatar panel — only one, always visible */}
+              <div className="flex flex-col items-center justify-start pt-4 md:pt-6 px-4 md:w-[200px] flex-shrink-0">
+                <Avatar isSpeaking={tts.isSpeaking} size={120} />
               </div>
               <ChatWindow messages={messages} language={language} streamingIndex={streamingIndex} />
             </div>
