@@ -62,3 +62,16 @@ body {
 .dark ::-webkit-scrollbar-thumb {
   background: #5b21b6;
 }
+
+
+/* Avatar mouth animation */
+@keyframes mouth-move {
+  0%, 100% { ry: 6; rx: 10; }
+  25% { ry: 3; rx: 8; }
+  50% { ry: 8; rx: 12; }
+  75% { ry: 4; rx: 9; }
+}
+
+.animate-mouth {
+  animation: mouth-move 0.4s ease-in-out infinite;
+}

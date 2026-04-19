@@ -1,5 +1,6 @@
 import React from 'react'
 import SpeechPlayer from './SpeechPlayer'
+import Avatar from './Avatar'
 
 function parseCitations(text) {
   const parts = []
@@ -48,7 +49,13 @@ export default function MessageBubble({ message, language, isStreaming }) {
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
-      <div className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 ${
+      {/* Avatar for AI messages */}
+      {!isUser && (
+        <div className="flex-shrink-0 mr-2 mt-1 hidden sm:block">
+          <Avatar isSpeaking={isStreaming} size={36} />
+        </div>
+      )}
+      <div className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-3 ${
         isUser
           ? 'bg-gradient-to-r from-brand-600 to-brand-700 text-white rounded-br-md'
           : 'bg-white dark:bg-brand-950 text-text dark:text-brand-100 border border-brand-100 dark:border-brand-800 rounded-bl-md'

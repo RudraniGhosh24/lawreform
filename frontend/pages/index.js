@@ -7,6 +7,7 @@ import VoiceButton from '../src/components/VoiceButton'
 import ChatWindow from '../src/components/ChatWindow'
 import ScenarioTiles from '../src/components/ScenarioTiles'
 import DocumentUpload from '../src/components/DocumentUpload'
+import Avatar from '../src/components/Avatar'
 import useSpeechRecognition from '../src/hooks/useSpeechRecognition'
 import useSpeechSynthesis from '../src/hooks/useSpeechSynthesis'
 
@@ -178,8 +179,9 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Mic button with live transcription */}
+              {/* Avatar + Mic button with live transcription */}
               <div className="flex flex-col items-center gap-3">
+                <Avatar isSpeaking={tts.isSpeaking} size={100} />
                 <VoiceButton isListening={speech.isListening} onToggle={handleMicToggle} isSupported={speech.isSupported} />
                 {speech.isListening && (
                   <div className="text-center max-w-sm">
