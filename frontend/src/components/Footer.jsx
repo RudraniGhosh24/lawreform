@@ -24,12 +24,21 @@ export default function Footer() {
         </a>
         {' for '}
         <a
-          href="https://github.com/RudraniGhosh24/lawreform"
+          href="https://www.kaggle.com/competitions/gemma-4-good-hackathon"
           target="_blank"
           rel="noopener noreferrer"
           className="text-brand-600 hover:underline"
         >
           The Gemma 4 Good Hackathon
+        </a>
+        {' · '}
+        <a
+          href="https://github.com/RudraniGhosh24/lawreform"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-brand-600 hover:underline"
+        >
+          GitHub Code
         </a>
       </p>
     </footer>
