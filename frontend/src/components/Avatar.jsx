@@ -1,11 +1,31 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 /**
- * Avatar using DiceBear Personas (free, CC0 public domain, no attribution needed).
- * Sound bar animation overlay when speaking.
+ * Avatar using DiceBear ToonHead style (CC BY 4.0 — Johan Melin).
+ * Two states: smiling (idle) and agape (speaking) for lip-sync effect.
  */
+
+const BASE_PARAMS = 'hair=bun&hairColor=5c3317&skinColor=d4a87a&clothesColor=9333ea&clothes=shirt&eyebrows=happy&eyes=humble&rearHair=longStraight&rearHairProbability=100&backgroundColor=f3e8ff&backgroundType=solid&beard=&beardProbability=0&seed=lawreformer-woman'
+
+const IDLE_URL = `https://api.dicebear.com/9.x/toon-head/svg?${BASE_PARAMS}&mouth=smile`
+const SPEAK_URL = `https://api.dicebear.com/9.x/toon-head/svg?${BASE_PARAMS}&mouth=agape`
+
 export default function Avatar({ isSpeaking, size = 220 }) {
-  const avatarUrl = `https://api.dicebear.com/9.x/personas/svg?seed=lawreformer-ai&eyes=open&mouth=smile&hair=long&hairColor=6a3520&skinColor=d4a574&clothingColor=9333ea&backgroundColor=f3e8ff&size=${Math.max(size, 200)}`
+  const [showOpen, setShowOpen] = useState(false)
+
+  // Alternate between open/closed mouth when speaking for lip-sync
+  useEffect(() => {
+    if (!isSpeaking) {
+      setShowOpen(false)
+      return
+    }
+    const interval = setInterval(() => {
+      setShowOpen(prev => !prev)
+    }, 280)
+    return () => clearInterval(interval)
+  }, [isSpeaking])
+
+  const currentUrl = isSpeaking && showOpen ? SPEAK_URL : IDLE_URL
 
   return (
     <div
@@ -13,34 +33,21 @@ export default function Avatar({ isSpeaking, size = 220 }) {
       style={{ width: size, height: size }}
     >
       {isSpeaking && (
-        <div className="absolute inset-0 rounded-2xl border-2 border-brand-400/40 animate-pulse z-30 pointer-events-none" />
+        <div className="absolute inset-[-3px] rounded-2xl border-2 border-brand-400/40 animate-pulse z-30 pointer-events-none" />
       )}
 
+      {/* Preload both images */}
+      <link rel="preload" href={IDLE_URL} as="image" />
+      <link rel="preload" href={SPEAK_URL} as="image" />
+
       <img
-        src={avatarUrl}
+        src={currentUrl}
         alt="Lawreformer AI Assistant"
         width={size}
         height={size}
-        className="w-full h-full object-cover rounded-2xl"
+        className="w-full h-full object-cover rounded-2xl transition-none"
         loading="eager"
       />
-
-      {isSpeaking && (
-        <div className="absolute bottom-[20%] left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-          <div className="flex gap-[2px] items-end">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="w-[3px] bg-brand-500 rounded-full"
-                style={{
-                  animation: `soundbar 0.4s ease-in-out ${i * 0.08}s infinite alternate`,
-                  height: '8px',
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
 
       {size >= 100 && (
         <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white dark:bg-brand-950 border border-brand-200 dark:border-brand-800 rounded-full px-4 py-1 shadow-md z-30">
