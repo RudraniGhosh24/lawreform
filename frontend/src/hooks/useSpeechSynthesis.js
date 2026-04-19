@@ -29,10 +29,36 @@ export default function useSpeechSynthesis(language = 'English') {
   const [isPaused, setIsPaused] = useState(false)
   const [rate, setRate] = useState(1)
   const [voices, setVoices] = useState([])
+  const [unlocked, setUnlocked] = useState(false)
   const utteranceRef = useRef(null)
+  const pendingTextRef = useRef(null)
 
   const isSupported =
     typeof window !== 'undefined' && 'speechSynthesis' in window
+
+  // Unlock TTS on first user interaction (mobile requirement)
+  useEffect(() => {
+    if (!isSupported || unlocked) return
+    const unlock = () => {
+      const u = new SpeechSynthesisUtterance('')
+      u.volume = 0
+      window.speechSynthesis.speak(u)
+      window.speechSynthesis.cancel()
+      setUnlocked(true)
+      // If there's a pending speak, play it now
+      if (pendingTextRef.current) {
+        const text = pendingTextRef.current
+        pendingTextRef.current = null
+        setTimeout(() => speakInternal(text), 100)
+      }
+    }
+    document.addEventListener('click', unlock, { once: true })
+    document.addEventListener('touchstart', unlock, { once: true })
+    return () => {
+      document.removeEventListener('click', unlock)
+      document.removeEventListener('touchstart', unlock)
+    }
+  }, [isSupported, unlocked])
 
   // Load voices — browsers load them async
   useEffect(() => {
@@ -86,7 +112,7 @@ export default function useSpeechSynthesis(language = 'English') {
     return null
   }, [language, voices, isSupported])
 
-  const speak = useCallback(
+  const speakInternal = useCallback(
     (text) => {
       if (!isSupported || !text) return
       window.speechSynthesis.cancel()
@@ -149,6 +175,16 @@ export default function useSpeechSynthesis(language = 'English') {
     },
     [language, rate, getVoice, isSupported]
   )
+
+  // Public speak — queues if TTS not yet unlocked on mobile
+  const speak = useCallback((text) => {
+    if (!isSupported || !text) return
+    if (!unlocked) {
+      pendingTextRef.current = text
+      return
+    }
+    speakInternal(text)
+  }, [isSupported, unlocked, speakInternal])
 
   const pause = useCallback(() => {
     if (isSupported) {

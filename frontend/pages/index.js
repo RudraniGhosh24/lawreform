@@ -110,8 +110,8 @@ export default function Home() {
         }
       }
 
-      // Auto-play TTS on desktop only (mobile blocks auto-play, user taps Listen button)
-      if (fullResponse && tts.isSupported && !/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      // Auto-play TTS (mobile unlocked via first user tap)
+      if (fullResponse && tts.isSupported) {
         const clean = fullResponse.replace(/\[([^\]]+)\]/g, '').replace(/[📜✨→•*#_~`|]/g, '').replace(/https?:\/\/\S+/g, '').replace(/\b\d{10,}\b/g, '').replace(/₹\s?(\d)/g, 'rupees $1').replace(/\n+/g, '. ').replace(/\s{2,}/g, ' ').replace(/\.\s*\./g, '.').trim()
         setTimeout(() => { tts.speak(clean) }, 300)
       }
