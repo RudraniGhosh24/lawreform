@@ -4,21 +4,19 @@ const LANG_CONFIG = {
   English: {
     codes: ['en-IN', 'en'],
     rate: 0.95,
-    pitch: 1.0,
-    preferred: ['Google India English', 'Microsoft Ravi', 'Rishi', 'en-IN', 'en_IN'],
+    pitch: 1.1,
+    preferred: ['Google India English Female', 'Microsoft Heera', 'Veena', 'Lekha', 'Google India English'],
   },
   Hindi: {
     codes: ['hi-IN', 'hi'],
     rate: 0.9,
-    pitch: 1.05,
-    preferred: ['Google हिन्दी', 'Microsoft Hemant', 'Microsoft Kalpana', 'Lekha'],
+    pitch: 1.1,
+    preferred: ['Google हिन्दी', 'Microsoft Kalpana', 'Lekha', 'Swati'],
   },
   Bengali: {
     codes: ['bn-IN', 'bn-BD', 'bn'],
     rate: 0.85,
-    pitch: 1.0,
-    // Bengali voices are rare — also try Hindi as fallback since it sounds
-    // more natural than English for Bengali text
+    pitch: 1.1,
     preferred: ['Google বাংলা', 'Piya', 'Tanishaa'],
     fallbackCodes: ['hi-IN', 'hi'],
   },
@@ -74,11 +72,13 @@ export default function useSpeechSynthesis(language = 'English') {
   // Smart voice selection — female voices only
   const isFemaleVoice = (v) => {
     const name = v.name.toLowerCase()
-    // Exclude known male voices
-    if (/\b(male|ravi|hemant|david|james|mark|daniel|george)\b/i.test(name)) return false
+    // Block all known male voices
+    if (/\b(male|ravi|hemant|david|james|mark|daniel|george|richard|thomas|rishi|aaron|adam|brian|chris|fred|guy|kumar|mohan|raj)\b/i.test(name)) return false
     // Prefer known female voices
-    if (/\b(female|zira|samantha|kalpana|lekha|piya|tanishaa|google.*english|google.*हिन्दी|google.*বাংলা)\b/i.test(name)) return true
-    // Default: assume female if not clearly male
+    if (/\b(female|zira|samantha|kalpana|lekha|piya|tanishaa|heera|veena|swati|priya|neerja|flo|karen|victoria|susan|tessa|moira)\b/i.test(name)) return true
+    // If name contains "woman" or "girl"
+    if (/woman|girl|female/i.test(name)) return true
+    // Default: accept (most default voices are female)
     return true
   }
 
