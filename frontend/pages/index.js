@@ -32,7 +32,12 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false)
   const [streamingIndex, setStreamingIndex] = useState(-1)
 
-  const speech = useSpeechRecognition(language)
+  const speech = useSpeechRecognition(language, (text) => {
+    // Auto-submit when user stops speaking
+    if (text && !isLoading) {
+      sendToAPI(text, null)
+    }
+  })
   const tts = useSpeechSynthesis(language)
 
   const [isMobile, setIsMobile] = useState(false)

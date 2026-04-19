@@ -6,13 +6,13 @@ const LANG_CODES = {
   Bengali: 'bn-IN',
 }
 
-export default function useSpeechRecognition(language = 'English') {
+export default function useSpeechRecognition(language = 'English', onSpeechEnd) {
   const [transcript, setTranscript] = useState('')
   const [isListening, setIsListening] = useState(false)
   const [isSupported, setIsSupported] = useState(false)
   const recognitionRef = useRef(null)
+  const finalTranscriptRef = useRef('')
 
-  // Check support on mount (avoids SSR issues)
   useEffect(() => {
     setIsSupported(
       typeof window !== 'undefined' &&
@@ -23,16 +23,16 @@ export default function useSpeechRecognition(language = 'English') {
   const startListening = useCallback(() => {
     if (!isSupported) return
 
-    // Stop any existing session first (mobile fix)
     if (recognitionRef.current) {
       try { recognitionRef.current.stop() } catch {}
     }
+
+    finalTranscriptRef.current = ''
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     const recognition = new SpeechRecognition()
 
     recognition.lang = LANG_CODES[language] || 'en-IN'
-    // Mobile: continuous=false works better, desktop: continuous=true
     recognition.continuous = !/Android|iPhone|iPad/i.test(navigator.userAgent)
     recognition.interimResults = true
     recognition.maxAlternatives = 1
@@ -40,22 +40,22 @@ export default function useSpeechRecognition(language = 'English') {
     recognition.onstart = () => setIsListening(true)
 
     recognition.onresult = (event) => {
-      let finalTranscript = ''
-      let interimTranscript = ''
+      let finalT = ''
+      let interimT = ''
       for (let i = 0; i < event.results.length; i++) {
         const result = event.results[i]
         if (result.isFinal) {
-          finalTranscript += result[0].transcript
+          finalT += result[0].transcript
         } else {
-          interimTranscript += result[0].transcript
+          interimT += result[0].transcript
         }
       }
-      setTranscript(finalTranscript + interimTranscript)
+      finalTranscriptRef.current = finalT
+      setTranscript(finalT + interimT)
     }
 
     recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error)
-      // On mobile, "not-allowed" means user denied mic permission
       if (event.error === 'not-allowed') {
         alert('Please allow microphone access to use voice input.')
       }
@@ -64,6 +64,11 @@ export default function useSpeechRecognition(language = 'English') {
 
     recognition.onend = () => {
       setIsListening(false)
+      // Auto-submit when user stops speaking and there's a transcript
+      const text = finalTranscriptRef.current.trim()
+      if (text && onSpeechEnd) {
+        setTimeout(() => onSpeechEnd(text), 300)
+      }
     }
 
     recognitionRef.current = recognition
@@ -74,7 +79,7 @@ export default function useSpeechRecognition(language = 'English') {
       console.error('Failed to start recognition:', e)
       setIsListening(false)
     }
-  }, [language, isSupported])
+  }, [language, isSupported, onSpeechEnd])
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
@@ -85,6 +90,7 @@ export default function useSpeechRecognition(language = 'English') {
 
   const resetTranscript = useCallback(() => {
     setTranscript('')
+    finalTranscriptRef.current = ''
   }, [])
 
   return {
