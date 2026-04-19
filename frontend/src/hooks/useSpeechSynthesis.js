@@ -5,7 +5,7 @@ const LANG_CONFIG = {
     codes: ['en-IN', 'en'],
     rate: 0.95,
     pitch: 1.0,
-    preferred: ['Google India English', 'Microsoft Ravi', 'Rishi', 'en-IN', 'Google UK English Female', 'Google US English'],
+    preferred: ['Google India English', 'Microsoft Ravi', 'Rishi', 'en-IN', 'en_IN'],
   },
   Hindi: {
     codes: ['hi-IN', 'hi'],
