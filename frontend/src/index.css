@@ -75,3 +75,10 @@ body {
 .animate-mouth {
   animation: mouth-move 0.4s ease-in-out infinite;
 }
+
+
+/* Sound bar animation for avatar speaking */
+@keyframes soundbar {
+  0% { height: 4px; }
+  100% { height: 16px; }
+}
