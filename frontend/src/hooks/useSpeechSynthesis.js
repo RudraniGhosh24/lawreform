@@ -93,33 +93,59 @@ export default function useSpeechSynthesis(language = 'English') {
 
       const config = LANG_CONFIG[language] || LANG_CONFIG.English
 
-      // Break long text into sentences for more natural pauses
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = config.codes[0]
-      utterance.rate = rate !== 1 ? rate : config.rate
-      utterance.pitch = config.pitch
+      // Mobile fix: Chrome on Android pauses TTS after ~15s. 
+      // Split into shorter chunks and queue them.
+      const maxLen = 200
+      const sentences = text.match(/[^.!?।]+[.!?।]?\s*/g) || [text]
+      const chunks = []
+      let current = ''
+      for (const s of sentences) {
+        if ((current + s).length > maxLen && current) {
+          chunks.push(current.trim())
+          current = s
+        } else {
+          current += s
+        }
+      }
+      if (current.trim()) chunks.push(current.trim())
 
-      const voice = getVoice()
-      if (voice) {
-        utterance.voice = voice
-        utterance.lang = voice.lang
+      let chunkIndex = 0
+      const speakNext = () => {
+        if (chunkIndex >= chunks.length) {
+          setIsSpeaking(false)
+          setIsPaused(false)
+          return
+        }
+
+        const utterance = new SpeechSynthesisUtterance(chunks[chunkIndex])
+        utterance.lang = config.codes[0]
+        utterance.rate = rate !== 1 ? rate : config.rate
+        utterance.pitch = config.pitch
+
+        const voice = getVoice()
+        if (voice) {
+          utterance.voice = voice
+          utterance.lang = voice.lang
+        }
+
+        utterance.onstart = () => {
+          setIsSpeaking(true)
+          setIsPaused(false)
+        }
+        utterance.onend = () => {
+          chunkIndex++
+          speakNext()
+        }
+        utterance.onerror = () => {
+          setIsSpeaking(false)
+          setIsPaused(false)
+        }
+
+        utteranceRef.current = utterance
+        window.speechSynthesis.speak(utterance)
       }
 
-      utterance.onstart = () => {
-        setIsSpeaking(true)
-        setIsPaused(false)
-      }
-      utterance.onend = () => {
-        setIsSpeaking(false)
-        setIsPaused(false)
-      }
-      utterance.onerror = () => {
-        setIsSpeaking(false)
-        setIsPaused(false)
-      }
-
-      utteranceRef.current = utterance
-      window.speechSynthesis.speak(utterance)
+      speakNext()
     },
     [language, rate, getVoice, isSupported]
   )

@@ -35,6 +35,15 @@ export default function Home() {
   const speech = useSpeechRecognition(language)
   const tts = useSpeechSynthesis(language)
 
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 640)
+    const onResize = () => setIsMobile(window.innerWidth < 640)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
   }, [darkMode])
@@ -101,7 +110,8 @@ export default function Home() {
         }
       }
 
-      if (fullResponse && tts.isSupported) {
+      // Auto-play TTS on desktop only (mobile blocks auto-play, user taps Listen button)
+      if (fullResponse && tts.isSupported && !/Android|iPhone|iPad/i.test(navigator.userAgent)) {
         const clean = fullResponse.replace(/\[([^\]]+)\]/g, '').replace(/[📜✨→•*#_~`|]/g, '').replace(/https?:\/\/\S+/g, '').replace(/\b\d{10,}\b/g, '').replace(/₹\s?(\d)/g, 'rupees $1').replace(/\n+/g, '. ').replace(/\s{2,}/g, ' ').replace(/\.\s*\./g, '.').trim()
         setTimeout(() => { tts.speak(clean) }, 300)
       }
@@ -128,11 +138,11 @@ export default function Home() {
 
         <main className="flex-1 flex flex-col overflow-hidden max-w-5xl w-full mx-auto">
           {hasMessages ? (
-            /* ===== CHAT VIEW — single big avatar on side (desktop), top (mobile) ===== */
-            <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-              {/* Avatar panel — only one, always visible */}
-              <div className="flex flex-col items-center justify-start pt-4 md:pt-6 px-4 md:w-[200px] flex-shrink-0">
-                <Avatar isSpeaking={tts.isSpeaking} size={120} />
+            /* ===== CHAT VIEW — avatar beside chat ===== */
+            <div className="flex-1 flex flex-row overflow-hidden">
+              {/* Avatar panel — always on the left side */}
+              <div className="flex flex-col items-center justify-start pt-4 px-2 sm:px-4 flex-shrink-0">
+                <Avatar isSpeaking={tts.isSpeaking} size={isMobile ? 60 : 120} />
               </div>
               <ChatWindow messages={messages} language={language} streamingIndex={streamingIndex} />
             </div>
