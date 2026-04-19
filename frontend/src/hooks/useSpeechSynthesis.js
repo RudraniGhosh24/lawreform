@@ -1,45 +1,110 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 
-const LANG_CODES = {
-  English: 'en-IN',
-  Hindi: 'hi-IN',
-  Bengali: 'bn-IN',
+const LANG_CONFIG = {
+  English: {
+    codes: ['en-IN', 'en-GB', 'en-US'],
+    rate: 0.95,
+    pitch: 1.0,
+    // Prefer these voice names (Google's high-quality voices)
+    preferred: ['Google हिन्दी', 'Google UK English Female', 'Google US English', 'Microsoft Zira', 'Samantha', 'Rishi'],
+  },
+  Hindi: {
+    codes: ['hi-IN', 'hi'],
+    rate: 0.9,
+    pitch: 1.05,
+    preferred: ['Google हिन्दी', 'Microsoft Hemant', 'Microsoft Kalpana', 'Lekha'],
+  },
+  Bengali: {
+    codes: ['bn-IN', 'bn-BD', 'bn'],
+    rate: 0.85,
+    pitch: 1.0,
+    // Bengali voices are rare — also try Hindi as fallback since it sounds
+    // more natural than English for Bengali text
+    preferred: ['Google বাংলা', 'Piya', 'Tanishaa'],
+    fallbackCodes: ['hi-IN', 'hi'],
+  },
 }
 
 export default function useSpeechSynthesis(language = 'English') {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
   const [rate, setRate] = useState(1)
+  const [voices, setVoices] = useState([])
   const utteranceRef = useRef(null)
 
   const isSupported =
     typeof window !== 'undefined' && 'speechSynthesis' in window
 
-  // Find the best voice for the language
+  // Load voices — browsers load them async
+  useEffect(() => {
+    if (!isSupported) return
+
+    const loadVoices = () => {
+      const v = window.speechSynthesis.getVoices()
+      if (v.length > 0) setVoices(v)
+    }
+
+    loadVoices()
+    window.speechSynthesis.onvoiceschanged = loadVoices
+    return () => { window.speechSynthesis.onvoiceschanged = null }
+  }, [isSupported])
+
+  // Smart voice selection — pick the most natural-sounding voice
   const getVoice = useCallback(() => {
-    if (!isSupported) return null
-    const voices = window.speechSynthesis.getVoices()
-    const langCode = LANG_CODES[language] || 'en-IN'
-    // Prefer a voice matching the exact locale, then the language prefix
-    return (
-      voices.find((v) => v.lang === langCode) ||
-      voices.find((v) => v.lang.startsWith(langCode.split('-')[0])) ||
-      null
-    )
-  }, [language, isSupported])
+    if (!isSupported || voices.length === 0) return null
+
+    const config = LANG_CONFIG[language] || LANG_CONFIG.English
+
+    // 1. Try preferred voice names first (these are the best quality)
+    for (const name of config.preferred) {
+      const match = voices.find((v) => v.name.includes(name))
+      if (match) return match
+    }
+
+    // 2. Try exact language code matches, prefer non-local (network) voices
+    for (const code of config.codes) {
+      // Prefer remote/network voices (higher quality)
+      const remote = voices.find((v) => v.lang === code && !v.localService)
+      if (remote) return remote
+      const local = voices.find((v) => v.lang === code)
+      if (local) return local
+    }
+
+    // 3. Try language prefix match
+    const prefix = config.codes[0].split('-')[0]
+    const prefixMatch = voices.find((v) => v.lang.startsWith(prefix) && !v.localService)
+      || voices.find((v) => v.lang.startsWith(prefix))
+    if (prefixMatch) return prefixMatch
+
+    // 4. For Bengali — fall back to Hindi voice if no Bengali voice exists
+    if (config.fallbackCodes) {
+      for (const code of config.fallbackCodes) {
+        const fb = voices.find((v) => v.lang === code)
+        if (fb) return fb
+      }
+    }
+
+    return null
+  }, [language, voices, isSupported])
 
   const speak = useCallback(
     (text) => {
       if (!isSupported || !text) return
       window.speechSynthesis.cancel()
 
+      const config = LANG_CONFIG[language] || LANG_CONFIG.English
+
+      // Break long text into sentences for more natural pauses
       const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = LANG_CODES[language] || 'en-IN'
-      utterance.rate = rate
-      utterance.pitch = 1
+      utterance.lang = config.codes[0]
+      utterance.rate = rate !== 1 ? rate : config.rate
+      utterance.pitch = config.pitch
 
       const voice = getVoice()
-      if (voice) utterance.voice = voice
+      if (voice) {
+        utterance.voice = voice
+        utterance.lang = voice.lang
+      }
 
       utterance.onstart = () => {
         setIsSpeaking(true)
@@ -79,14 +144,6 @@ export default function useSpeechSynthesis(language = 'English') {
       window.speechSynthesis.cancel()
       setIsSpeaking(false)
       setIsPaused(false)
-    }
-  }, [isSupported])
-
-  // Load voices (some browsers load them async)
-  useEffect(() => {
-    if (isSupported) {
-      window.speechSynthesis.getVoices()
-      window.speechSynthesis.onvoiceschanged = () => {}
     }
   }, [isSupported])
 
