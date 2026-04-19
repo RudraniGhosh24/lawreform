@@ -35,13 +35,14 @@ export default async function handler(req, res) {
   const model = process.env.GEMMA_MODEL || 'gemma-3-27b-it';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
+  const fullPrompt = SYS + ' Respond in ' + (language || 'English') + '.\n\nLegal context:\n' + LEGAL_KB + '\n\nUser question: ' + question;
+
   try {
     const r = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: SYS + ' Respond in ' + (language || 'English') + '.' }] },
-        contents: [{ parts: [{ text: 'Legal context:\n' + LEGAL_KB + '\n\nQuestion: ' + question }] }],
+        contents: [{ parts: [{ text: fullPrompt }] }],
         generationConfig: { temperature: 0.7, topP: 0.9, topK: 40, maxOutputTokens: 1024 },
       }),
     });
