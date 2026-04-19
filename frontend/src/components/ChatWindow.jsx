@@ -15,24 +15,26 @@ export default function ChatWindow({ messages, language, streamingIndex, isSpeak
   if (messages.length === 0) return null
 
   return (
-    <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 space-y-3" role="log" aria-label="Conversation">
-      {messages.map((msg, i) => {
-        const isAI = msg.role === 'assistant'
-        const isCurrentlyStreaming = i === streamingIndex
-        const isLastAI = isAI && i === messages.length - 1
-        return (
-          <div key={i}>
-            {isAI && (
-              <div className="flex items-center gap-2 mb-2 ml-1">
-                <Avatar isSpeaking={isCurrentlyStreaming || (isLastAI && isSpeaking)} size={56} />
-                <span className="text-xs text-text-muted font-medium">Lawreformer AI</span>
-              </div>
-            )}
-            <MessageBubble message={msg} language={language} isStreaming={isCurrentlyStreaming} />
-          </div>
-        )
-      })}
-      <div ref={bottomRef} />
+    <div className="flex-1 flex flex-row overflow-hidden">
+      {/* Left 25% — avatar, sticky, always visible */}
+      <div className="w-[70px] sm:w-[25%] max-w-[160px] flex-shrink-0 flex flex-col items-center pt-4 px-1 sm:px-3 border-r border-brand-100 dark:border-brand-900 bg-brand-50/30 dark:bg-brand-950/30">
+        <div className="sticky top-4">
+          <Avatar isSpeaking={isSpeaking} size={typeof window !== 'undefined' && window.innerWidth < 640 ? 56 : 120} />
+        </div>
+      </div>
+
+      {/* Right 75% — scrollable messages */}
+      <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 space-y-3" role="log" aria-label="Conversation">
+        {messages.map((msg, i) => (
+          <MessageBubble
+            key={i}
+            message={msg}
+            language={language}
+            isStreaming={i === streamingIndex}
+          />
+        ))}
+        <div ref={bottomRef} />
+      </div>
     </div>
   )
 }
