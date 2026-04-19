@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Bengali', sans-serif;
+  background-color: #FAFAF7;
+  color: #1C1C1E;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dark body {
+  background-color: #1C1C1E;
+  color: #FAFAF7;
+}
+
+/* Pulsing mic animation */
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.mic-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: #FF6B1A;
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+/* Streaming text cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.streaming-cursor::after {
+  content: '▊';
+  animation: blink 0.8s infinite;
+  color: #FF6B1A;
+  margin-left: 2px;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #444;
+}

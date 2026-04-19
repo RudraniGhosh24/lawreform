@@ -1,0 +1,68 @@
+RIGHT TO INFORMATION ACT, 2005 (RTI)
+
+Source: india.gov.in, rti.gov.in (Public Domain)
+
+KEY PROVISIONS FOR CITIZENS:
+
+1. YOUR RIGHT TO KNOW
+Every citizen of India has the right to request information from any public authority (government office). The public authority must respond within 30 days. This is a fundamental right.
+
+2. WHAT YOU CAN ASK FOR
+- Copies of any government document
+- Details of government decisions and policies
+- Information about government spending and contracts
+- Status of any government application or complaint
+- Inspection of government works and records
+
+3. HOW TO FILE AN RTI APPLICATION
+Step 1: Write a simple application addressed to the Public Information Officer (PIO) of the relevant government department.
+Step 2: State clearly what information you need. You do NOT need to give a reason.
+Step 3: Pay the application fee of ₹10 (by cash, demand draft, or postal order). BPL (Below Poverty Line) card holders are exempt from fees.
+Step 4: Submit in person, by post, or online at rtionline.gov.in.
+
+4. ONLINE RTI FILING
+- Visit: rtionline.gov.in
+- Select the department
+- Fill in your details and question
+- Pay ₹10 online
+- Track your application status online
+
+5. TIMELINE
+- Response must come within 30 days
+- If it concerns life or liberty: within 48 hours
+- If PIO transfers to another department: 35 days total
+
+6. FIRST APPEAL
+If you don't receive a response or are unsatisfied:
+- File a First Appeal with the First Appellate Authority (senior officer in the same department)
+- Must be filed within 30 days of the response (or non-response)
+- No fee for first appeal
+
+7. SECOND APPEAL
+If the First Appeal fails:
+- File a Second Appeal with the Central/State Information Commission
+- The Commission can impose penalties on officers who deny information without valid reason
+
+8. EXEMPTIONS
+RTI does not cover:
+- Information affecting national security
+- Cabinet papers
+- Personal information with no public interest
+- Information protected by court orders
+
+9. PENALTIES
+If a PIO fails to provide information without reasonable cause:
+- Penalty of ₹250 per day of delay
+- Maximum penalty: ₹25,000
+
+RTI FORM A (SAMPLE):
+To: The Public Information Officer
+[Name of Department/Office]
+Subject: Application under RTI Act, 2005
+Sir/Madam,
+I request the following information under the Right to Information Act, 2005:
+[Your specific question]
+I am paying the prescribed fee of ₹10.
+Name: ___
+Address: ___
+Date: ___

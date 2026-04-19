@@ -1,34 +1,33 @@
 # Dependencies
 node_modules/
-.pnp
-.pnp.js
+frontend/node_modules/
+backend/venv/
+__pycache__/
+*.pyc
 
-# Next.js
-frontend/.next/
-frontend/out/
-
-# Env files — NEVER commit these
+# Environment
+.env
+backend/.env
 frontend/.env.local
 frontend/.env.production
-backend/.env
-*.env
 
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-.venv/
-venv/
-env/
-*.egg-info/
-dist/
-build/
+# Build output
+frontend/dist/
+frontend/.next/
+.vercel/
 
-# OS
-.DS_Store
-Thumbs.db
+# ChromaDB local store
+backend/chroma_db/
 
 # IDE
 .vscode/
 .idea/
 *.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
