@@ -1,7 +1,6 @@
 # Lawreformer AI
 
-**Built by Rudrani Ghosh · [lawreformer.com](https://lawreformer.com)**
-© 2026 Rudrani Ghosh. All rights reserved.
+**Built by Rudrani Ghosh · [ai.lawreformer.com](https://ai.lawreformer.com)**
 
 > Kaggle Gemma 4 Good Hackathon · Digital Equity & Inclusivity Track
 
