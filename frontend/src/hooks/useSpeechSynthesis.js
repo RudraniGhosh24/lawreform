@@ -2,10 +2,10 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 
 const LANG_CONFIG = {
   English: {
-    codes: ['en-IN', 'en-GB', 'en-US', 'en'],
+    codes: ['en-IN', 'en'],
     rate: 0.95,
     pitch: 1.0,
-    preferred: ['Google UK English Female', 'Google US English', 'Microsoft Zira', 'Samantha', 'Rishi', 'Google UK English Male'],
+    preferred: ['Google India English', 'Microsoft Ravi', 'Rishi', 'en-IN', 'Google UK English Female', 'Google US English'],
   },
   Hindi: {
     codes: ['hi-IN', 'hi'],
