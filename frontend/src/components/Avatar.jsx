@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react'
  * Two states: smiling (idle) and agape (speaking) for lip-sync effect.
  */
 
-const BASE_PARAMS = 'hair=bun&hairColor=5c3317&skinColor=d4a87a&clothesColor=9333ea&clothes=shirt&eyebrows=happy&eyes=humble&rearHair=longStraight&rearHairProbability=100&backgroundColor=f3e8ff&backgroundType=solid&beard=&beardProbability=0&seed=lawreformer-woman'
+const BASE_PARAMS = 'hair=bun&hairColor=5c3317&skinColor=f0c8a0&clothesColor=9333ea&clothes=shirt&eyebrows=happy&eyes=bow&rearHair=longStraight&rearHairProbability=100&backgroundColor=f3e8ff&backgroundType=solid&beard=&beardProbability=0&seed=lawreformer-woman'
 
 const IDLE_URL = `https://api.dicebear.com/9.x/toon-head/svg?${BASE_PARAMS}&mouth=smile`
 const SPEAK_URL = `https://api.dicebear.com/9.x/toon-head/svg?${BASE_PARAMS}&mouth=agape`
