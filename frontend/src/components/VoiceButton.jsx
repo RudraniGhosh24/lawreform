@@ -6,10 +6,10 @@ export default function VoiceButton({ isListening, onToggle, isSupported }) {
   return (
     <button
       onClick={onToggle}
-      className={`relative w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 min-w-[64px] min-h-[64px] ${
+      className={`relative w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 min-w-[64px] min-h-[64px] border-2 ${
         isListening
-          ? 'bg-red-500 text-white mic-pulse shadow-lg shadow-red-500/30'
-          : 'bg-brand-gradient text-white hover:opacity-90 shadow-lg shadow-brand-500/30'
+          ? 'bg-red-500 border-red-400 text-white mic-pulse shadow-lg shadow-red-500/30'
+          : 'bg-brand-600 border-brand-500 text-white hover:bg-brand-700 shadow-lg shadow-brand-500/30'
       }`}
       aria-label={isListening ? 'Stop recording' : 'Start recording'}
       aria-pressed={isListening}
