@@ -8,12 +8,16 @@ export default function SpeechPlayer({ text, language }) {
   if (!isSupported) return null
 
   const cleanText = text
-    .replace(/\[([^\]]+)\]/g, '') // Remove citation brackets entirely for cleaner speech
-    .replace(/[📜✨→•]/g, '') // Remove emojis/symbols
-    .replace(/https?:\/\/\S+/g, '') // Remove URLs (TTS reads them badly)
-    .replace(/\d{4,}/g, (m) => m.split('').join(' ')) // Space out long numbers
+    .replace(/\[([^\]]+)\]/g, '') // Remove citation brackets
+    .replace(/[📜✨→•🔊⏸️⏹️▶️🗣️⚖️🤖🎙️📄📋🚨📝⚙️⏰🤪🏠ℹ️]/gu, '') // Remove emojis
+    .replace(/[*#_~`|]/g, '') // Remove markdown symbols like * # _ ~ `
+    .replace(/https?:\/\/\S+/g, '') // Remove URLs
+    .replace(/\b\d{10,}\b/g, '') // Remove very long numbers (phone etc)
+    .replace(/₹\s?(\d)/g, 'rupees $1') // Convert ₹ to "rupees"
     .replace(/\n{2,}/g, '. ') // Double newlines become pauses
+    .replace(/\n/g, '. ') // Single newlines too
     .replace(/\s{2,}/g, ' ') // Collapse whitespace
+    .replace(/\.\s*\./g, '.') // Remove double periods
     .trim()
 
   return (

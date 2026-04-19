@@ -102,7 +102,7 @@ export default function Home() {
       }
 
       if (fullResponse && tts.isSupported) {
-        const clean = fullResponse.replace(/\[([^\]]+)\]/g, '').replace(/[📜✨→•]/g, '').replace(/https?:\/\/\S+/g, '').replace(/\n{2,}/g, '. ').replace(/\s{2,}/g, ' ').trim()
+        const clean = fullResponse.replace(/\[([^\]]+)\]/g, '').replace(/[📜✨→•*#_~`|]/g, '').replace(/https?:\/\/\S+/g, '').replace(/\b\d{10,}\b/g, '').replace(/₹\s?(\d)/g, 'rupees $1').replace(/\n+/g, '. ').replace(/\s{2,}/g, ' ').replace(/\.\s*\./g, '.').trim()
         setTimeout(() => { tts.speak(clean) }, 300)
       }
     } catch {
