@@ -13,7 +13,7 @@ export default function Footer() {
         >
           Rudrani Ghosh
         </a>
-        {' · '}
+        {' · owner of '}
         <a
           href="https://lawreformer.com"
           target="_blank"
@@ -22,7 +22,15 @@ export default function Footer() {
         >
           lawreformer.com
         </a>
-        {' · © 2026 Rudrani Ghosh. All rights reserved.'}
+        {' for '}
+        <a
+          href="https://www.kaggle.com/competitions/gemma-4-good-hackathon"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-brand-600 hover:underline"
+        >
+          The Gemma 4 Good Hackathon
+        </a>
       </p>
     </footer>
   )
