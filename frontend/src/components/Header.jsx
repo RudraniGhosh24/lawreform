@@ -6,34 +6,24 @@ export default function Header({ language, setLanguage, onAboutClick, darkMode, 
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/90 dark:bg-[#0f0a1a]/90 backdrop-blur border-b border-brand-100 dark:border-brand-900">
-        <div className="max-w-5xl mx-auto px-3 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setMenuOpen(true)}
-              className="p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-950 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
-              aria-label="Open menu"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text dark:text-white"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            </button>
-            <a href="https://lawreformer.com" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
-              <span className="text-lg">⚖️</span>
-              <span className="text-base font-bold text-text dark:text-white">
-                LawReformer <span className="bg-gradient-to-r from-brand-500 to-brand-700 bg-clip-text text-transparent">AI</span>
-              </span>
-            </a>
-          </div>
+      {/* Floating menu button — always visible, top-left */}
+      <button
+        onClick={() => setMenuOpen(true)}
+        className="fixed top-3 left-3 z-50 p-2 rounded-xl bg-white/90 dark:bg-[#0f0a1a]/90 backdrop-blur border border-brand-200 dark:border-brand-800 shadow-md hover:shadow-lg transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"
+        aria-label="Open menu"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-600"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
 
-          <div className="flex items-center gap-1.5">
-            <LanguageSelector language={language} setLanguage={setLanguage} />
-            <button onClick={() => setDarkMode(!darkMode)}
-              className="p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-950 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center text-sm"
-              aria-label={darkMode ? 'Light mode' : 'Dark mode'}>
-              {darkMode ? '☀️' : '🌙'}
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Floating language + dark mode — top-right */}
+      <div className="fixed top-3 right-3 z-50 flex items-center gap-1.5">
+        <LanguageSelector language={language} setLanguage={setLanguage} />
+        <button onClick={() => setDarkMode(!darkMode)}
+          className="p-2 rounded-xl bg-white/90 dark:bg-[#0f0a1a]/90 backdrop-blur border border-brand-200 dark:border-brand-800 shadow-md hover:shadow-lg transition-all min-w-[40px] min-h-[40px] flex items-center justify-center text-sm"
+          aria-label={darkMode ? 'Light mode' : 'Dark mode'}>
+          {darkMode ? '☀️' : '🌙'}
+        </button>
+      </div>
 
       {/* Side menu overlay */}
       {menuOpen && (
@@ -44,7 +34,9 @@ export default function Header({ language, setLanguage, onAboutClick, darkMode, 
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-brand-100 dark:border-brand-900">
-              <span className="font-bold text-text dark:text-white">⚖️ LawReformer</span>
+              <a href="https://lawreformer.com" className="font-bold text-text dark:text-white flex items-center gap-1.5">
+                <span>⚖️</span> LawReformer <span className="bg-gradient-to-r from-brand-500 to-brand-700 bg-clip-text text-transparent">AI</span>
+              </a>
               <button onClick={() => setMenuOpen(false)} className="p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-950 text-text-muted" aria-label="Close menu">✕</button>
             </div>
 
@@ -62,7 +54,7 @@ export default function Header({ language, setLanguage, onAboutClick, darkMode, 
 
               <p className="px-4 py-2 mt-3 text-[10px] uppercase tracking-wider text-text-light font-semibold">Info</p>
               <button onClick={() => { onAboutClick(); setMenuOpen(false) }} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-muted hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-colors text-left">ℹ️ About</button>
-              <a href="https://lawreformer.com/about" className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-muted hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-colors">🏠 lawreformer.com</a>
+              <a href="https://lawreformer.com" className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-muted hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-colors">🏠 lawreformer.com</a>
             </div>
 
             <div className="px-4 py-3 border-t border-brand-100 dark:border-brand-900 text-[10px] text-text-light">
