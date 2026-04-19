@@ -63,6 +63,9 @@ export default function Home() {
     try {
       const body = { question, language }
       if (imageData) body.image = imageData
+      // Send conversation history for context retention
+      const prevMessages = messages.filter(m => m.content && m.content.length > 0)
+      if (prevMessages.length > 0) body.history = prevMessages
 
       const res = await fetch('/api/ask', {
         method: 'POST',

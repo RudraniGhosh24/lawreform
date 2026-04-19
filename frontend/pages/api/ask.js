@@ -33,7 +33,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { question, language, image } = req.body || {};
+  const { question, language, image, history } = req.body || {};
   if (!question && !image) return res.status(400).json({ error: 'Question or image required' });
 
   const apiKey = process.env.GEMMA_API_KEY;
@@ -47,20 +47,39 @@ export default async function handler(req, res) {
   const fullPrompt = SYS + ' Respond in ' + lang + '.\n\nLegal knowledge base:\n' + LEGAL_KB + '\n\nUser question: ' + (question || 'Please analyze the uploaded document and explain what legal rights apply.');
 
   try {
-    // Build request parts — support text + image (multimodal)
-    const parts = [{ text: fullPrompt }];
+    // Build conversation history for multi-turn context
+    const contents = [];
+
+    // First message includes system prompt + legal KB
+    const systemMsg = SYS + ' Respond in ' + lang + '.\n\nLegal knowledge base:\n' + LEGAL_KB;
+
+    // Add previous conversation turns
+    if (history && history.length > 0) {
+      // First user message gets the system context prepended
+      contents.push({ role: 'user', parts: [{ text: systemMsg + '\n\nUser: ' + history[0].content }] });
+      for (let i = 1; i < history.length; i++) {
+        const msg = history[i];
+        contents.push({
+          role: msg.role === 'user' ? 'user' : 'model',
+          parts: [{ text: msg.content }],
+        });
+      }
+    }
+
+    // Current question
+    const currentParts = [{ text: contents.length === 0 ? systemMsg + '\n\nUser question: ' + (question || 'Analyze this document and explain my legal rights.') : (question || 'Analyze this document and explain my legal rights.') }];
     if (image) {
-      // image is base64 data URI: "data:image/jpeg;base64,..."
       const [meta, base64] = image.split(',');
       const mimeType = meta.match(/data:(.*?);/)?.[1] || 'image/jpeg';
-      parts.push({ inline_data: { mime_type: mimeType, data: base64 } });
+      currentParts.push({ inline_data: { mime_type: mimeType, data: base64 } });
     }
+    contents.push({ role: 'user', parts: currentParts });
 
     const r = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts }],
+        contents,
         generationConfig: { temperature: 0.7, topP: 0.9, topK: 40, maxOutputTokens: 1500 },
       }),
     });
