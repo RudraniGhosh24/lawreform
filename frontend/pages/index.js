@@ -127,7 +127,20 @@ export default function Home() {
 
       // Auto-play TTS
       if (fullResponse && tts.isSupported) {
-        const clean = fullResponse.replace(/\[([^\]]+)\]/g, '').replace(/[📜✨→•*#_~`|]/g, '').replace(/https?:\/\/\S+/g, '').replace(/\b\d{10,}\b/g, '').replace(/₹\s?(\d)/g, 'rupees $1').replace(/\n+/g, '. ').replace(/\s{2,}/g, ' ').replace(/\.\s*\./g, '.').trim()
+        const numToWords = (n) => {
+          const ones = ['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen']
+          const tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety']
+          const num = parseInt(n)
+          if (isNaN(num)) return n
+          if (num === 0) return 'zero'
+          if (num < 20) return ones[num]
+          if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? ' ' + ones[num%10] : '')
+          if (num < 1000) return ones[Math.floor(num/100)] + ' hundred' + (num%100 ? ' and ' + numToWords(String(num%100)) : '')
+          if (num < 100000) return numToWords(String(Math.floor(num/1000))) + ' thousand' + (num%1000 ? ' ' + numToWords(String(num%1000)) : '')
+          if (num < 10000000) return numToWords(String(Math.floor(num/100000))) + ' lakh' + (num%100000 ? ' ' + numToWords(String(num%100000)) : '')
+          return numToWords(String(Math.floor(num/10000000))) + ' crore' + (num%10000000 ? ' ' + numToWords(String(num%10000000)) : '')
+        }
+        const clean = fullResponse.replace(/\[([^\]]+)\]/g, '').replace(/[📜✨→•*#_~`|]/g, '').replace(/https?:\/\/\S+/g, '').replace(/₹\s?(\d[\d,]*)/g, (_, n) => 'rupees ' + numToWords(n.replace(/,/g, ''))).replace(/\b(\d[\d,]+)\b/g, (_, n) => numToWords(n.replace(/,/g, ''))).replace(/\n+/g, '. ').replace(/\s{2,}/g, ' ').replace(/\.\s*\./g, '.').trim()
         tts.speak(clean)
       }
     } catch {
