@@ -6,7 +6,11 @@ export default function ChatWindow({ messages, language, streamingIndex, isSpeak
   const bottomRef = useRef(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    // Small delay to ensure avatar + message are rendered before scrolling
+    const timer = setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 50)
+    return () => clearTimeout(timer)
   }, [messages, messages[messages.length - 1]?.content])
 
   if (messages.length === 0) return null

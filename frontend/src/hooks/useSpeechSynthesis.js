@@ -40,23 +40,20 @@ export default function useSpeechSynthesis(language = 'English') {
   useEffect(() => {
     if (!isSupported || unlocked) return
     const unlock = () => {
-      const u = new SpeechSynthesisUtterance('')
-      u.volume = 0
-      window.speechSynthesis.speak(u)
-      window.speechSynthesis.cancel()
+      try {
+        const u = new SpeechSynthesisUtterance('')
+        u.volume = 0
+        window.speechSynthesis.speak(u)
+        window.speechSynthesis.cancel()
+      } catch {}
       setUnlocked(true)
-      // If there's a pending speak, play it now
-      if (pendingTextRef.current) {
-        const text = pendingTextRef.current
-        pendingTextRef.current = null
-        setTimeout(() => speakInternal(text), 100)
-      }
     }
-    document.addEventListener('click', unlock, { once: true })
-    document.addEventListener('touchstart', unlock, { once: true })
+    // Listen on both click and touchend for maximum compatibility
+    document.addEventListener('click', unlock, { once: true, capture: true })
+    document.addEventListener('touchend', unlock, { once: true, capture: true })
     return () => {
-      document.removeEventListener('click', unlock)
-      document.removeEventListener('touchstart', unlock)
+      document.removeEventListener('click', unlock, { capture: true })
+      document.removeEventListener('touchend', unlock, { capture: true })
     }
   }, [isSupported, unlocked])
 
@@ -74,37 +71,45 @@ export default function useSpeechSynthesis(language = 'English') {
     return () => { window.speechSynthesis.onvoiceschanged = null }
   }, [isSupported])
 
-  // Smart voice selection — pick the most natural-sounding voice
+  // Smart voice selection — female voices only
+  const isFemaleVoice = (v) => {
+    const name = v.name.toLowerCase()
+    // Exclude known male voices
+    if (/\b(male|ravi|hemant|david|james|mark|daniel|george)\b/i.test(name)) return false
+    // Prefer known female voices
+    if (/\b(female|zira|samantha|kalpana|lekha|piya|tanishaa|google.*english|google.*हिन्दी|google.*বাংলা)\b/i.test(name)) return true
+    // Default: assume female if not clearly male
+    return true
+  }
+
   const getVoice = useCallback(() => {
     if (!isSupported || voices.length === 0) return null
 
     const config = LANG_CONFIG[language] || LANG_CONFIG.English
 
-    // 1. Try preferred voice names first (these are the best quality)
+    // 1. Try preferred voice names first — female only
     for (const name of config.preferred) {
-      const match = voices.find((v) => v.name.includes(name))
+      const match = voices.find((v) => v.name.includes(name) && isFemaleVoice(v))
       if (match) return match
     }
 
-    // 2. Try exact language code matches, prefer non-local (network) voices
+    // 2. Try exact language code matches — female, prefer network voices
     for (const code of config.codes) {
-      // Prefer remote/network voices (higher quality)
-      const remote = voices.find((v) => v.lang === code && !v.localService)
+      const remote = voices.find((v) => v.lang === code && !v.localService && isFemaleVoice(v))
       if (remote) return remote
-      const local = voices.find((v) => v.lang === code)
+      const local = voices.find((v) => v.lang === code && isFemaleVoice(v))
       if (local) return local
     }
 
-    // 3. Try language prefix match
+    // 3. Try language prefix match — female
     const prefix = config.codes[0].split('-')[0]
-    const prefixMatch = voices.find((v) => v.lang.startsWith(prefix) && !v.localService)
-      || voices.find((v) => v.lang.startsWith(prefix))
+    const prefixMatch = voices.find((v) => v.lang.startsWith(prefix) && isFemaleVoice(v))
     if (prefixMatch) return prefixMatch
 
-    // 4. For Bengali — fall back to Hindi voice if no Bengali voice exists
+    // 4. For Bengali — fall back to Hindi female voice
     if (config.fallbackCodes) {
       for (const code of config.fallbackCodes) {
-        const fb = voices.find((v) => v.lang === code)
+        const fb = voices.find((v) => v.lang === code && isFemaleVoice(v))
         if (fb) return fb
       }
     }
@@ -180,7 +185,14 @@ export default function useSpeechSynthesis(language = 'English') {
   const speak = useCallback((text) => {
     if (!isSupported || !text) return
     if (!unlocked) {
+      // Store pending text and try to play after a short delay (user may have just tapped)
       pendingTextRef.current = text
+      setTimeout(() => {
+        if (pendingTextRef.current) {
+          speakInternal(pendingTextRef.current)
+          pendingTextRef.current = null
+        }
+      }, 500)
       return
     }
     speakInternal(text)
