@@ -138,14 +138,8 @@ export default function Home() {
 
         <main className="flex-1 flex flex-col overflow-hidden max-w-5xl w-full mx-auto">
           {hasMessages ? (
-            /* ===== CHAT VIEW — avatar beside chat ===== */
-            <div className="flex-1 flex flex-row overflow-hidden">
-              {/* Avatar panel — always on the left side */}
-              <div className="flex flex-col items-center justify-start pt-4 px-2 sm:px-4 flex-shrink-0">
-                <Avatar isSpeaking={tts.isSpeaking} size={isMobile ? 60 : 120} />
-              </div>
-              <ChatWindow messages={messages} language={language} streamingIndex={streamingIndex} />
-            </div>
+            /* ===== CHAT VIEW — avatar scrolls with messages ===== */
+            <ChatWindow messages={messages} language={language} streamingIndex={streamingIndex} isSpeaking={tts.isSpeaking} />
           ) : (
             /* ===== HOME VIEW — compact, content-first ===== */
             <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 sm:py-6 gap-3 sm:gap-4 overflow-y-auto">
