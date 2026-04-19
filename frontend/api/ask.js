@@ -2,15 +2,11 @@
 // Calls Gemma 4 via Google AI Studio with embedded Indian legal knowledge
 // Built by Rudrani Ghosh · lawreformer.com
 
-export const config = {
-  maxDuration: 60,
-};
-
 const LEGAL_KNOWLEDGE = `
 INDIAN LEGAL KNOWLEDGE BASE (Public Domain — india.gov.in, legislative.gov.in)
 
 1. WEST BENGAL PREMISES TENANCY ACT, 1997 (Rent Control)
-- Security deposit cannot exceed 3 months' rent
+- Security deposit cannot exceed 3 months rent
 - Landlord cannot increase rent arbitrarily; tenant can challenge before Rent Controller
 - Tenant cannot be evicted without court order from Rent Controller
 - Landlord cannot cut off water/electricity to force eviction (punishable offence)
@@ -25,68 +21,68 @@ INDIAN LEGAL KNOWLEDGE BASE (Public Domain — india.gov.in, legislative.gov.in)
 - No unauthorized deductions; total deductions cannot exceed 50% of wages
 - Equal pay for equal work regardless of gender
 - Overtime wages: twice the normal rate
-- Penalty: up to ₹50,000 first offence, ₹1,00,000 + imprisonment for repeat
+- Penalty: up to 50000 first offence, 100000 + imprisonment for repeat
 - Complaint: Labour Commissioner (no fee), helpline 14434, shramsuvidha.gov.in
-- West Bengal unskilled minimum wage: approximately ₹326/day
 
 3. RIGHT TO INFORMATION ACT, 2005 (RTI)
 - Every citizen can request information from any public authority
 - Response within 30 days (48 hours if life/liberty concerned)
-- Fee: ₹10 (BPL exempt). Online: rtionline.gov.in
+- Fee: Rs 10 (BPL exempt). Online: rtionline.gov.in
 - No reason needed for requesting information
 - First Appeal: to First Appellate Authority within 30 days (free)
-- Second Appeal: to Information Commission. Penalty on officers: ₹250/day, max ₹25,000
+- Second Appeal: to Information Commission
 
 4. MGNREGA (Mahatma Gandhi National Rural Employment Guarantee Act, 2005)
 - Every rural household: legal right to 100 days wage employment per year
 - Job Card: free, issued within 15 days from Gram Panchayat
 - Work must be provided within 15 days of application, within 5 km of village
-- If no work within 15 days: unemployment allowance (1/4 wage first 30 days, then 1/2)
+- If no work within 15 days: unemployment allowance
 - Wages within 15 days, directly to bank account, no contractors allowed
-- Worksite must have: drinking water, shade, first aid, crèche
 - Complaints: Gram Panchayat, Block Development Officer, nrega.nic.in
 
 5. PROTECTION OF WOMEN FROM DOMESTIC VIOLENCE ACT, 2005
 - Covers: physical, sexual, verbal/emotional, economic abuse
-- Protects: wife, live-in partner, mother, sister, daughter in domestic relationship
+- Protects: wife, live-in partner, mother, sister, daughter
 - Right to residence: cannot be thrown out of shared household
 - Protection orders, monetary relief, custody orders, compensation available
 - Women Helpline: 181 (toll-free, 24/7). Police: 100
 - File Domestic Incident Report with Protection Officer (free, no lawyer needed)
-- Magistrate must hear case within 3 days. Violation = imprisonment up to 1 year
 - Free legal aid available under Legal Services Authorities Act
 
 6. CONSUMER PROTECTION ACT, 2019
 - Rights: safety, information, choice, be heard, redressal, education
-- Covers: defective goods, deficient services, unfair trade, overcharging (above MRP)
-- Forums: up to ₹1 crore District, ₹1-10 crore State, above ₹10 crore National
+- Covers: defective goods, deficient services, unfair trade, overcharging
 - Online: consumerhelpline.gov.in, helpline 1800-11-4000, edaakhil.nic.in
-- Resolution within 3-5 months. Covers e-commerce purchases too
-- Product liability: manufacturers/sellers liable for harm from defective products
+- Covers e-commerce purchases too
 
 7. LEGAL SERVICES AUTHORITIES ACT, 1987 (Free Legal Aid)
-- Free legal aid for: SC/ST, trafficking victims, women, children, disabled, workers below income limit, undertrial prisoners, disaster victims
-- Includes: free lawyer, court fees, legal documents, advice, Lok Adalat
+- Free legal aid for: SC/ST, trafficking victims, women, children, disabled, workers below income limit, undertrial prisoners
 - Apply at District Legal Services Authority (DLSA) in district court complex
 - NALSA helpline: 15100 (toll-free). Website: nalsa.gov.in
 - Lok Adalat: free dispute resolution, no court fee, decision is final
 
-8. DOMESTIC WORKERS' RIGHTS
+8. DOMESTIC WORKERS RIGHTS
 - Covered under Code on Wages 2019 for minimum wages
 - Covered under Sexual Harassment at Workplace Act 2013
-- Social security: Pradhan Mantri Jeevan Jyoti Bima, Ayushman Bharat, PM Shram Yogi Maan-dhan (₹3,000/month pension after 60)
 - Register at eshram.gov.in for benefits
-- Kerala has specific Domestic Workers Act 2015
 `;
 
-const SYSTEM_PROMPT = `You are Lawreformer AI, created by Rudrani Ghosh (lawreformer.com). You help people in India understand their legal rights in plain, simple language. Never give legal advice — always frame answers as "you may have the right to..." Cite the specific law you are drawing from. Be warm, clear, and non-intimidating. After your explanation, suggest 2-3 concrete next steps the person can take. Format law citations in square brackets like [Right to Information Act, 2005].`;
+const SYSTEM_PROMPT = 'You are Lawreformer AI, created by Rudrani Ghosh (lawreformer.com). You help people in India understand their legal rights in plain, simple language. Never give legal advice — always frame answers as "you may have the right to..." Cite the specific law you are drawing from. Be warm, clear, and non-intimidating. After your explanation, suggest 2-3 concrete next steps the person can take. Format law citations in square brackets like [Right to Information Act, 2005].';
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { question, language = 'English' } = req.body;
+  const { question, language } = req.body || {};
 
   if (!question) {
     return res.status(400).json({ error: 'Question is required' });
@@ -98,13 +94,13 @@ export default async function handler(req, res) {
   }
 
   const model = process.env.GEMMA_MODEL || 'gemma-3-27b-it';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`;
+  const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey;
 
-  const systemWithLang = SYSTEM_PROMPT + ` Respond in ${language}.`;
-  const userMessage = `Legal context (use these to ground your answer):\n${LEGAL_KNOWLEDGE}\n\nUser's question: ${question}`;
+  const systemWithLang = SYSTEM_PROMPT + ' Respond in ' + (language || 'English') + '.';
+  const userMessage = 'Legal context (use these to ground your answer):\n' + LEGAL_KNOWLEDGE + '\n\nUser question: ' + question;
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -122,48 +118,22 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const errText = await response.text();
       console.error('Gemma API error:', response.status, errText);
-      return res.status(502).json({ error: `Gemma API error: ${response.status}` });
+      return res.status(502).json({ error: 'Gemma API error: ' + response.status, detail: errText });
     }
 
-    // Stream SSE back to client
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not generate a response.';
+
+    // Return as SSE format so frontend streaming code works
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const jsonStr = line.slice(6).trim();
-          if (!jsonStr || jsonStr === '[DONE]') continue;
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (text) {
-              res.write(`data: ${JSON.stringify({ token: text })}\n\n`);
-            }
-          } catch {
-            // skip malformed chunks
-          }
-        }
-      }
-    }
-
-    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+    res.write('data: ' + JSON.stringify({ token: text }) + '\n\n');
+    res.write('data: ' + JSON.stringify({ done: true }) + '\n\n');
     res.end();
   } catch (err) {
     console.error('Server error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error', detail: String(err) });
   }
-}
+};
