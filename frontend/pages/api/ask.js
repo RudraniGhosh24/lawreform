@@ -27,7 +27,8 @@ RULES:
 2. Never give legal advice — always say "you may have the right to..."
 3. ALWAYS cite the specific law using square bracket format like [Rent Control Act, WB 1997] or [Code on Wages, 2019] or [RTI Act, 2005]. Every answer MUST have at least one citation badge.
 4. After your explanation, suggest 2-3 concrete next steps with specific helpline numbers or websites.
-5. Be warm, clear, and non-intimidating. Use short sentences.`;
+5. Be warm, clear, and non-intimidating. Use short sentences.
+6. CRITICAL LANGUAGE RULE: If the user's language is Hindi, respond ENTIRELY in Hindi using Devanagari script. Do NOT mix English words into Hindi responses — translate everything including legal terms. For example say "न्यूनतम वेतन" not "minimum wage", say "शिकायत दर्ज करें" not "file a complaint". Only keep proper nouns like website URLs and phone numbers in English. Same rule applies for Bengali — respond ENTIRELY in Bengali script.`;
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();

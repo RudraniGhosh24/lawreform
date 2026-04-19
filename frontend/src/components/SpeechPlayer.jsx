@@ -7,7 +7,14 @@ export default function SpeechPlayer({ text, language }) {
 
   if (!isSupported) return null
 
-  const cleanText = text.replace(/\[([^\]]+)\]/g, '$1')
+  const cleanText = text
+    .replace(/\[([^\]]+)\]/g, '') // Remove citation brackets entirely for cleaner speech
+    .replace(/[📜✨→•]/g, '') // Remove emojis/symbols
+    .replace(/https?:\/\/\S+/g, '') // Remove URLs (TTS reads them badly)
+    .replace(/\d{4,}/g, (m) => m.split('').join(' ')) // Space out long numbers
+    .replace(/\n{2,}/g, '. ') // Double newlines become pauses
+    .replace(/\s{2,}/g, ' ') // Collapse whitespace
+    .trim()
 
   return (
     <div className="flex items-center gap-2 flex-wrap">

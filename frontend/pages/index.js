@@ -105,9 +105,14 @@ export default function Home() {
 
       // Auto-play TTS — no extra button press needed
       if (fullResponse && tts.isSupported) {
-        setTimeout(() => {
-          tts.speak(fullResponse.replace(/\[([^\]]+)\]/g, '$1'))
-        }, 300)
+        const cleanForTTS = fullResponse
+          .replace(/\[([^\]]+)\]/g, '')
+          .replace(/[📜✨→•]/g, '')
+          .replace(/https?:\/\/\S+/g, '')
+          .replace(/\n{2,}/g, '. ')
+          .replace(/\s{2,}/g, ' ')
+          .trim()
+        setTimeout(() => { tts.speak(cleanForTTS) }, 300)
       }
     } catch (err) {
       setMessages(prev => {
