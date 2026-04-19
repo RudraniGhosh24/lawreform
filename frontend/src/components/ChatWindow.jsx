@@ -7,10 +7,10 @@ export default function ChatWindow({ messages, language, streamingIndex, isSpeak
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, 50)
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }, 100)
     return () => clearTimeout(timer)
-  }, [messages, messages[messages.length - 1]?.content])
+  }, [messages, messages.length, messages[messages.length - 1]?.content])
 
   if (messages.length === 0) return null
 

@@ -59,6 +59,16 @@ export default function Home() {
 
   const sendToAPI = useCallback(async (question, imageData) => {
     if ((!question && !imageData) || isLoading) return
+
+    // Pre-warm TTS on user gesture (mobile needs this)
+    if (tts.isSupported) {
+      try {
+        const warm = new SpeechSynthesisUtterance(' ')
+        warm.volume = 0
+        window.speechSynthesis.speak(warm)
+      } catch {}
+    }
+
     speech.stopListening()
     speech.resetTranscript()
     setInput('')
@@ -115,10 +125,10 @@ export default function Home() {
         }
       }
 
-      // Auto-play TTS (mobile unlocked via first user tap)
+      // Auto-play TTS
       if (fullResponse && tts.isSupported) {
         const clean = fullResponse.replace(/\[([^\]]+)\]/g, '').replace(/[📜✨→•*#_~`|]/g, '').replace(/https?:\/\/\S+/g, '').replace(/\b\d{10,}\b/g, '').replace(/₹\s?(\d)/g, 'rupees $1').replace(/\n+/g, '. ').replace(/\s{2,}/g, ' ').replace(/\.\s*\./g, '.').trim()
-        setTimeout(() => { tts.speak(clean) }, 300)
+        tts.speak(clean)
       }
     } catch {
       setMessages(prev => { const u = [...prev]; u[u.length - 1] = { role: 'assistant', content: '⚠️ Sorry, could not connect. Please try again.' }; return u })
