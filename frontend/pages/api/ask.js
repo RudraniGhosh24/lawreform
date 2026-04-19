@@ -1,4 +1,4 @@
-// Lawreformer AI — Gemma 4 API Route
+// LawReformer AI — Gemma 4 API Route
 // Model: gemma-3-27b-it via Google AI Studio
 // Built by Rudrani Ghosh · lawreformer.com
 
@@ -20,7 +20,7 @@ const LEGAL_KB = `
 [Source: Domestic Workers Rights — Code on Wages 2019 + Unorganised Workers Act 2008] Domestic workers covered under Code on Wages for minimum wages. Sexual Harassment at Workplace Act 2013 applies (household = workplace). Social security via eshram.gov.in. PM Shram Yogi Maan-dhan pension Rs 3000/month after 60.
 `;
 
-const SYS = `You are Lawreformer AI, a legal rights assistant created by Rudrani Ghosh (lawreformer.com), powered by Gemma 4.
+const SYS = `You are LawReformer AI, a legal rights assistant created by Rudrani Ghosh (lawreformer.com), powered by Gemma 4.
 
 RULES:
 1. Help people in India understand their legal rights in plain, simple language.

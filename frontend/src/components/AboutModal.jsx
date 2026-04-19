@@ -9,7 +9,7 @@ export default function AboutModal({ isOpen, onClose }) {
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label="About Lawreformer AI"
+      aria-label="About LawReformer AI"
     >
       <div
         className="bg-white dark:bg-brand-950 rounded-2xl max-w-md w-full p-6 shadow-xl border border-brand-100 dark:border-brand-800"

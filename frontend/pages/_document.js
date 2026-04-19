@@ -4,7 +4,7 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        <meta name="description" content="Lawreformer AI — Voice-enabled legal rights assistant for underserved communities in India. Built by Rudrani Ghosh." />
+        <meta name="description" content="LawReformer AI — Voice-enabled legal rights assistant for underserved communities in India. Built by Rudrani Ghosh." />
         <meta name="theme-color" content="#9333ea" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

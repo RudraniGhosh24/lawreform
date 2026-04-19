@@ -17,10 +17,8 @@ export default function ChatWindow({ messages, language, streamingIndex, isSpeak
   return (
     <div className="flex-1 flex flex-row overflow-hidden">
       {/* Left 25% — avatar, sticky, always visible */}
-      <div className="w-[70px] sm:w-[25%] max-w-[160px] flex-shrink-0 flex flex-col items-center pt-4 px-1 sm:px-3 border-r border-brand-100 dark:border-brand-900 bg-brand-50/30 dark:bg-brand-950/30">
-        <div className="sticky top-4">
-          <Avatar isSpeaking={isSpeaking} size={typeof window !== 'undefined' && window.innerWidth < 640 ? 56 : 120} />
-        </div>
+      <div className="w-[70px] sm:w-[25%] max-w-[160px] flex-shrink-0 flex flex-col items-center justify-center px-1 sm:px-3 border-r border-brand-100 dark:border-brand-900 bg-brand-50/30 dark:bg-brand-950/30">
+        <Avatar isSpeaking={isSpeaking} size={typeof window !== 'undefined' && window.innerWidth < 640 ? 56 : 120} />
       </div>
 
       {/* Right 75% — scrollable messages */}

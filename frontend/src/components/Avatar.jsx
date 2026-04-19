@@ -42,7 +42,7 @@ export default function Avatar({ isSpeaking, size = 220 }) {
 
       <img
         src={currentUrl}
-        alt="Lawreformer AI Assistant"
+        alt="LawReformer AI Assistant"
         width={size}
         height={size}
         className="w-full h-full object-cover rounded-2xl transition-none"
@@ -52,7 +52,7 @@ export default function Avatar({ isSpeaking, size = 220 }) {
       {size >= 100 && (
         <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white dark:bg-brand-950 border border-brand-200 dark:border-brand-800 rounded-full px-4 py-1 shadow-md z-30">
           <span className="text-xs font-medium text-brand-700 dark:text-brand-300 whitespace-nowrap">
-            {isSpeaking ? '🗣️ Speaking...' : '⚖️ Lawreformer AI'}
+            {isSpeaking ? '🗣️ Speaking...' : '⚖️ LawReformer AI'}
           </span>
         </div>
       )}
