@@ -73,8 +73,10 @@ export default function Home() {
     // Pre-warm TTS on user gesture (mobile needs this)
     if (tts.isSupported) {
       try {
-        const warm = new SpeechSynthesisUtterance(' ')
+        window.speechSynthesis.cancel()
+        const warm = new SpeechSynthesisUtterance('.')
         warm.volume = 0
+        warm.rate = 10
         window.speechSynthesis.speak(warm)
       } catch {}
     }
@@ -151,7 +153,8 @@ export default function Home() {
           return numToWords(String(Math.floor(num/10000000))) + ' crore' + (num%10000000 ? ' ' + numToWords(String(num%10000000)) : '')
         }
         const clean = fullResponse.replace(/\[([^\]]+)\]/g, '').replace(/[📜✨→•*#_~`|]/g, '').replace(/https?:\/\/\S+/g, '').replace(/₹\s?(\d[\d,]*)/g, (_, n) => 'rupees ' + numToWords(n.replace(/,/g, ''))).replace(/\b(\d[\d,]+)\b/g, (_, n) => numToWords(n.replace(/,/g, ''))).replace(/\n+/g, '. ').replace(/\s{2,}/g, ' ').replace(/\.\s*\./g, '.').trim()
-        tts.speak(clean)
+        // Small delay to let pre-warm finish, then speak
+        setTimeout(() => tts.speak(clean), 200)
       }
     } catch {
       setMessages(prev => { const u = [...prev]; u[u.length - 1] = { role: 'assistant', content: '⚠️ Sorry, could not connect. Please try again.' }; return u })
