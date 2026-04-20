@@ -180,7 +180,10 @@ export default function Home() {
 
   return (
     <>
-      <Head><title>LawReformer AI — Know Your Rights</title></Head>
+      <Head>
+        <title>LawReformer AI — Free Legal Rights Assistant for India | Know Your Rights</title>
+        <meta property="og:title" content="LawReformer AI — Know Your Legal Rights in India" />
+      </Head>
       <div className="flex flex-col h-screen bg-surface dark:bg-[#0f0a1a]">
         <Header language={language} setLanguage={setLanguage} onAboutClick={() => setAboutOpen(true)} darkMode={darkMode} setDarkMode={setDarkMode} />
 
