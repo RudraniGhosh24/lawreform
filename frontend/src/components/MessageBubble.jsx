@@ -40,6 +40,40 @@ function extractNextSteps(text) {
   return steps.slice(0, 3)
 }
 
+function renderMarkdown(text) {
+  // Split by **bold** and *italic* patterns and render as React elements
+  const parts = []
+  let remaining = text
+  let key = 0
+
+  while (remaining.length > 0) {
+    // Match **bold** first
+    const boldMatch = remaining.match(/\*\*(.+?)\*\*/)
+    // Match *italic*
+    const italicMatch = remaining.match(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/)
+
+    const boldIdx = boldMatch ? remaining.indexOf(boldMatch[0]) : Infinity
+    const italicIdx = italicMatch ? remaining.indexOf(italicMatch[0]) : Infinity
+
+    if (boldIdx === Infinity && italicIdx === Infinity) {
+      parts.push(remaining)
+      break
+    }
+
+    if (boldIdx <= italicIdx && boldMatch) {
+      if (boldIdx > 0) parts.push(remaining.slice(0, boldIdx))
+      parts.push(<strong key={key++} className="font-semibold">{boldMatch[1]}</strong>)
+      remaining = remaining.slice(boldIdx + boldMatch[0].length)
+    } else if (italicMatch) {
+      if (italicIdx > 0) parts.push(remaining.slice(0, italicIdx))
+      parts.push(<em key={key++}>{italicMatch[1]}</em>)
+      remaining = remaining.slice(italicIdx + italicMatch[0].length)
+    }
+  }
+
+  return parts
+}
+
 export default function MessageBubble({ message, language, isStreaming }) {
   const isUser = message.role === 'user'
   const parts = isUser ? [{ type: 'text', content: message.content }] : parseCitations(message.content)
@@ -60,7 +94,7 @@ export default function MessageBubble({ message, language, isStreaming }) {
                 <span>📜</span> {part.content}
               </span>
             ) : (
-              <span key={i}>{part.content}</span>
+              <span key={i}>{renderMarkdown(part.content)}</span>
             )
           )}
         </div>
