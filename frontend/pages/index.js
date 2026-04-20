@@ -55,6 +55,18 @@ export default function Home() {
     document.documentElement.classList.toggle('dark', darkMode)
   }, [darkMode])
 
+  // Unlock TTS on first touch/click (mobile requirement)
+  useEffect(() => {
+    const unlock = () => {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        try { const w = new SpeechSynthesisUtterance('.'); w.volume = 0.01; w.rate = 10; window.speechSynthesis.speak(w) } catch {}
+      }
+    }
+    document.addEventListener('touchstart', unlock, { once: true })
+    document.addEventListener('click', unlock, { once: true })
+    return () => { document.removeEventListener('touchstart', unlock); document.removeEventListener('click', unlock) }
+  }, [])
+
   useEffect(() => {
     if (speech.transcript) setInput(speech.transcript)
   }, [speech.transcript])
@@ -62,11 +74,13 @@ export default function Home() {
   const sendToAPI = useCallback(async (question, imageData) => {
     if ((!question && !imageData) || isLoading) return
 
-    // Pre-warm TTS on user gesture (mobile needs this)
-    if (tts.isSupported) {
+    // Unlock TTS on mobile — must happen synchronously in user gesture
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
       try {
-        const warm = new SpeechSynthesisUtterance(' ')
-        warm.volume = 0
+        window.speechSynthesis.cancel()
+        const warm = new SpeechSynthesisUtterance('.')
+        warm.volume = 0.01
+        warm.rate = 10
         window.speechSynthesis.speak(warm)
       } catch {}
     }
@@ -153,7 +167,13 @@ export default function Home() {
     }
   }, [input, isLoading, language, messages.length, speech, tts])
 
-  const handleSubmit = useCallback((q) => { sendToAPI(q || input.trim(), null) }, [input, sendToAPI])
+  const handleSubmit = useCallback((q) => {
+    // Unlock TTS on any submit action
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      try { window.speechSynthesis.cancel(); const w = new SpeechSynthesisUtterance('.'); w.volume = 0.01; w.rate = 10; window.speechSynthesis.speak(w) } catch {}
+    }
+    sendToAPI(q || input.trim(), null)
+  }, [input, sendToAPI])
   const handleDocUpload = useCallback((img) => { sendToAPI(input.trim() || 'Analyze this document and explain my legal rights.', img) }, [input, sendToAPI])
   const handleKeyDown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit() } }
   const handleMicToggle = () => { speech.isListening ? speech.stopListening() : (speech.resetTranscript(), speech.startListening()) }
