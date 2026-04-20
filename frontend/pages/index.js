@@ -70,6 +70,12 @@ export default function Home() {
   const sendToAPI = useCallback(async (question, imageData) => {
     if ((!question && !imageData) || isLoading) return
 
+    // CRITICAL: Unlock audio on Mac/mobile Chrome — must happen synchronously in click handler
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      const u = new SpeechSynthesisUtterance('')
+      window.speechSynthesis.speak(u)
+    }
+
     speech.stopListening()
     speech.resetTranscript()
     setInput('')
