@@ -80,15 +80,6 @@ export default function Home() {
   const sendToAPI = useCallback(async (question, imageData) => {
     if ((!question && !imageData) || isLoading) return
 
-    // Pre-warm TTS on user gesture (mobile needs this)
-    if (tts.isSupported) {
-      try {
-        const warm = new SpeechSynthesisUtterance(' ')
-        warm.volume = 0
-        window.speechSynthesis.speak(warm)
-      } catch {}
-    }
-
     speech.stopListening()
     speech.resetTranscript()
     setInput('')

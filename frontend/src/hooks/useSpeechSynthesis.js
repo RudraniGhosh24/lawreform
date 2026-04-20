@@ -134,10 +134,9 @@ export default function useSpeechSynthesis(language = 'English') {
   const speak = useCallback((text) => {
     if (!isSupported || !text) return
 
-    // Only cancel if WE are currently speaking (not on random touches)
-    if (speakingRef.current) {
-      window.speechSynthesis.cancel()
-    }
+    // Always cancel any pending speech first
+    window.speechSynthesis.cancel()
+    speakingRef.current = false
 
     const config = LANG_CONFIG[language] || LANG_CONFIG.English
 
@@ -167,11 +166,12 @@ export default function useSpeechSynthesis(language = 'English') {
       if (voice) { u.voice = voice; u.lang = voice.lang }
       u.onstart = () => { speakingRef.current = true; setIsSpeaking(true); setIsPaused(false) }
       u.onend = () => { i++; next() }
-      u.onerror = () => { speakingRef.current = false; setIsSpeaking(false); setIsPaused(false) }
+      u.onerror = (e) => { console.error('TTS error:', e); speakingRef.current = false; setIsSpeaking(false); setIsPaused(false) }
       utteranceRef.current = u
       window.speechSynthesis.speak(u)
     }
-    next()
+    // Small delay after cancel for browser compatibility
+    setTimeout(() => next(), 50)
   }, [language, rate, getVoice, isSupported])
 
   const pause = useCallback(() => {
