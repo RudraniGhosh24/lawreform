@@ -63,26 +63,34 @@ export default function useSpeechSynthesis(language = 'English') {
   const speak = useCallback((text) => {
     if (!isSupported || !text) return
     window.speechSynthesis.cancel()
-    speakingRef.current = false
 
     const config = LANG_CONFIG[language] || LANG_CONFIG.English
 
-    // Simple single utterance — no chunking, more reliable
-    const u = new SpeechSynthesisUtterance(text.slice(0, 500))
-    u.lang = config.codes[0]
-    u.rate = rate !== 1 ? rate : config.rate
-    u.pitch = config.pitch
+    // Chrome desktop bug: speak() silently fails after cancel() without delay
+    const doSpeak = () => {
+      const u = new SpeechSynthesisUtterance(text.slice(0, 500))
+      u.lang = config.codes[0]
+      u.rate = rate !== 1 ? rate : config.rate
+      u.pitch = config.pitch
 
-    // Try to find a female voice, but speak even if we can't
-    const voice = getVoice()
-    if (voice) { u.voice = voice; u.lang = voice.lang }
+      const voice = getVoice()
+      if (voice) { u.voice = voice; u.lang = voice.lang }
 
-    u.onstart = () => { speakingRef.current = true; setIsSpeaking(true); setIsPaused(false) }
-    u.onend = () => { speakingRef.current = false; setIsSpeaking(false); setIsPaused(false) }
-    u.onerror = (e) => { console.error('TTS error:', e); speakingRef.current = false; setIsSpeaking(false); setIsPaused(false) }
+      u.onstart = () => { speakingRef.current = true; setIsSpeaking(true); setIsPaused(false) }
+      u.onend = () => { speakingRef.current = false; setIsSpeaking(false); setIsPaused(false) }
+      u.onerror = (e) => { console.error('TTS error:', e); speakingRef.current = false; setIsSpeaking(false); setIsPaused(false) }
 
-    utteranceRef.current = u
-    window.speechSynthesis.speak(u)
+      utteranceRef.current = u
+      window.speechSynthesis.speak(u)
+
+      // Chrome bug workaround: resume if paused after 100ms
+      setTimeout(() => {
+        if (window.speechSynthesis.paused) window.speechSynthesis.resume()
+      }, 100)
+    }
+
+    // Delay after cancel for Chrome desktop
+    setTimeout(doSpeak, 50)
   }, [language, rate, getVoice, isSupported])
 
   const pause = useCallback(() => { if (isSupported) { window.speechSynthesis.pause(); setIsPaused(true) } }, [isSupported])
