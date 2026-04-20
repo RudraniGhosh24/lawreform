@@ -74,13 +74,20 @@ export default function Home() {
   const sendToAPI = useCallback(async (question, imageData) => {
     if ((!question && !imageData) || isLoading) return
 
-    // Unlock TTS on mobile — must happen synchronously in user gesture
+    // IMMEDIATELY speak a short phrase to unlock audio on macOS/Safari
+    // This MUST happen synchronously in the user gesture handler
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       try {
-        const warm = new SpeechSynthesisUtterance('.')
-        warm.volume = 0.01
-        warm.rate = 10
-        window.speechSynthesis.speak(warm)
+        window.speechSynthesis.cancel()
+        const unlock = new SpeechSynthesisUtterance('Let me look into that for you.')
+        unlock.rate = 1.0
+        unlock.pitch = 1.1
+        unlock.volume = 1
+        const voices = window.speechSynthesis.getVoices()
+        const femaleUS = voices.find(v => v.lang.startsWith('en') && !/male|ravi|david|james|rishi/i.test(v.name))
+        if (femaleUS) { unlock.voice = femaleUS; unlock.lang = femaleUS.lang }
+        else { unlock.lang = 'en-US' }
+        window.speechSynthesis.speak(unlock)
       } catch {}
     }
 
