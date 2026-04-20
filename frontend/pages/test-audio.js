@@ -6,7 +6,6 @@ export default function TestAudio() {
 
   const addLog = (msg) => setLog(prev => [...prev, new Date().toLocaleTimeString() + ': ' + msg])
 
-  // Pre-load voices on mount
   useEffect(() => {
     const load = () => {
       const v = window.speechSynthesis.getVoices()
@@ -17,61 +16,62 @@ export default function TestAudio() {
     return () => window.speechSynthesis.removeEventListener('voiceschanged', load)
   }, [])
 
-  // Test 1: Simplest possible speak — NO cancel, NO async
-  const testSimple = () => {
-    addLog('--- TEST SIMPLE ---')
-    const u = new SpeechSynthesisUtterance('Hello, testing one two three.')
-    u.onstart = () => addLog('onstart fired')
-    u.onend = () => addLog('onend fired')
-    u.onerror = (e) => addLog('onerror: ' + e.error)
-    window.speechSynthesis.speak(u)
-    addLog('speak() called, voices: ' + voicesRef.current.length)
+  const pickVoice = () => {
+    const voices = voicesRef.current.length > 0 ? voicesRef.current : window.speechSynthesis.getVoices()
+    const bad = /bad news|bells|boing|bubbles|cellos|good news|hysterical|junior|organ|superstar|trinoids|whisper|wobble|zarvox|albert|ralph|fred|rishi|daniel|david|thomas/i
+    const enVoices = voices.filter(v => v.lang.startsWith('en') && !bad.test(v.name))
+    const good = ['samantha', 'karen', 'victoria', 'susan', 'fiona', 'moira', 'tessa', 'google']
+    const best = enVoices.find(v => good.some(g => v.name.toLowerCase().includes(g)))
+    return best || enVoices[0] || null
   }
 
-  // Test 2: With voice set
-  const testWithVoice = () => {
-    addLog('--- TEST WITH VOICE ---')
+  const testSpeak = () => {
+    addLog('--- TEST ---')
     const voices = voicesRef.current.length > 0 ? voicesRef.current : window.speechSynthesis.getVoices()
     addLog('voices: ' + voices.length)
-    const u = new SpeechSynthesisUtterance('This test uses a specific voice.')
-    const enVoice = voices.find(v => v.lang.startsWith('en') && !/rishi|albert|daniel|david/i.test(v.name))
-    if (enVoice) { u.voice = enVoice; addLog('voice: ' + enVoice.name) }
-    else addLog('no en voice found')
-    u.onstart = () => addLog('onstart fired')
-    u.onend = () => addLog('onend fired')
-    u.onerror = (e) => addLog('onerror: ' + e.error)
+
+    const voice = pickVoice()
+    addLog('picked voice: ' + (voice ? voice.name + ' (' + voice.lang + ')' : 'NONE'))
+
+    const u = new SpeechSynthesisUtterance('Hello, this is a test of the speech system on your device.')
+    if (voice) u.voice = voice
+    u.lang = 'en-US'
+    u.rate = 0.9
+    u.pitch = 1.1
+
+    u.onstart = () => addLog('EVENT: onstart')
+    u.onend = () => addLog('EVENT: onend')
+    u.onerror = (e) => addLog('EVENT: onerror - ' + e.error)
+
     window.speechSynthesis.speak(u)
+    addLog('speak() called')
+
+    setTimeout(() => {
+      addLog('after 1s — speaking:' + window.speechSynthesis.speaking + ' paused:' + window.speechSynthesis.paused + ' pending:' + window.speechSynthesis.pending)
+    }, 1000)
   }
 
-  // Test 3: Cancel then speak
-  const testCancelThenSpeak = () => {
-    addLog('--- TEST CANCEL+SPEAK ---')
-    window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance('Testing after cancel.')
-    u.onstart = () => addLog('onstart fired')
-    u.onend = () => addLog('onend fired')
-    u.onerror = (e) => addLog('onerror: ' + e.error)
-    window.speechSynthesis.speak(u)
-    addLog('speak() called after cancel()')
+  const listVoices = () => {
+    const voices = voicesRef.current.length > 0 ? voicesRef.current : window.speechSynthesis.getVoices()
+    const en = voices.filter(v => v.lang.startsWith('en'))
+    addLog('--- EN VOICES (' + en.length + ') ---')
+    en.forEach(v => addLog(v.name + ' | ' + v.lang + ' | local:' + v.localService))
   }
 
   return (
-    <div style={{ padding: 20, fontFamily: 'monospace', fontSize: 14 }}>
-      <h1>TTS Debug</h1>
+    <div style={{ padding: 20, fontFamily: 'monospace', fontSize: 13 }}>
+      <h1>TTS Debug v2</h1>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20 }}>
-        <button onClick={testSimple} style={{ padding: '12px 20px', fontSize: 16, cursor: 'pointer', background: '#9333ea', color: 'white', border: 'none', borderRadius: 8 }}>
-          Test Simple
+        <button onClick={testSpeak} style={{ padding: '12px 20px', fontSize: 16, background: '#9333ea', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+          Test Speak
         </button>
-        <button onClick={testWithVoice} style={{ padding: '12px 20px', fontSize: 16, cursor: 'pointer', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8 }}>
-          Test With Voice
-        </button>
-        <button onClick={testCancelThenSpeak} style={{ padding: '12px 20px', fontSize: 16, cursor: 'pointer', background: '#dc2626', color: 'white', border: 'none', borderRadius: 8 }}>
-          Test Cancel+Speak
+        <button onClick={listVoices} style={{ padding: '12px 20px', fontSize: 16, background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer' }}>
+          List EN Voices
         </button>
         <button onClick={() => setLog([])} style={{ padding: '12px 20px', fontSize: 16, cursor: 'pointer' }}>Clear</button>
       </div>
-      <div style={{ background: '#f5f5f5', padding: 15, borderRadius: 8, maxHeight: 400, overflow: 'auto' }}>
-        {log.length === 0 ? <p>Click a test button</p> : log.map((l, i) => <div key={i}>{l}</div>)}
+      <div style={{ background: '#f5f5f5', padding: 15, borderRadius: 8, maxHeight: 500, overflow: 'auto' }}>
+        {log.length === 0 ? <p>Click a button</p> : log.map((l, i) => <div key={i} style={{ marginBottom: 2 }}>{l}</div>)}
       </div>
     </div>
   )
