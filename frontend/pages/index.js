@@ -80,6 +80,15 @@ export default function Home() {
   const sendToAPI = useCallback(async (question, imageData) => {
     if ((!question && !imageData) || isLoading) return
 
+    // CRITICAL: Warm up speechSynthesis during user gesture so it works after async fetch
+    if (tts.isSupported && window.speechSynthesis) {
+      window.speechSynthesis.cancel()
+      const warmup = new SpeechSynthesisUtterance('.')
+      warmup.volume = 0.01
+      warmup.rate = 10
+      window.speechSynthesis.speak(warmup)
+    }
+
     speech.stopListening()
     speech.resetTranscript()
     setInput('')
@@ -178,15 +187,6 @@ export default function Home() {
         <main className="flex-1 flex flex-col overflow-hidden max-w-5xl w-full mx-auto">
           {hasMessages ? (
             <>
-              {/* Tap to hear banner when browser blocked autoplay */}
-              {tts.pendingText && !tts.isSpeaking && (
-                <button
-                  onClick={() => tts.speak(tts.pendingText)}
-                  className="w-full py-2 bg-brand-500 text-white text-sm font-medium text-center animate-pulse"
-                >
-                  🔊 Tap here to hear the response
-                </button>
-              )}
               <ChatWindow messages={messages} language={language} streamingIndex={streamingIndex} isSpeaking={tts.isSpeaking} />
             </>
           ) : (

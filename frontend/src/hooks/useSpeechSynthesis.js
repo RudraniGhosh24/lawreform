@@ -98,35 +98,31 @@ export default function useSpeechSynthesis(language = 'English') {
     next()
   }, [language, rate, getVoice, isSupported])
 
-  // Queue text for speaking — will play on next user click if browser blocks autoplay
+  // Queue text for speaking
   const speak = useCallback((text) => {
     if (!isSupported || !text) return
-    // Try to speak directly
     doSpeak(text)
-    // Also store as pending in case browser blocked it
-    setPendingText(text)
   }, [isSupported, doSpeak])
-
-  // Play pending text on any user interaction (handles browser autoplay block)
-  useEffect(() => {
-    if (!pendingText) return
-    const playPending = () => {
-      if (pendingText && !window.speechSynthesis.speaking) {
-        doSpeak(pendingText)
-        setPendingText(null)
-      }
-    }
-    document.addEventListener('click', playPending, { once: true })
-    document.addEventListener('touchend', playPending, { once: true })
-    return () => {
-      document.removeEventListener('click', playPending)
-      document.removeEventListener('touchend', playPending)
-    }
-  }, [pendingText, doSpeak])
 
   const pause = useCallback(() => { if (isSupported) { window.speechSynthesis.pause(); setIsPaused(true) } }, [isSupported])
   const resume = useCallback(() => { if (isSupported) { window.speechSynthesis.resume(); setIsPaused(false) } }, [isSupported])
-  const stop = useCallback(() => { if (isSupported) { window.speechSynthesis.cancel(); setIsSpeaking(false); setIsPaused(false); setPendingText(null) } }, [isSupported])
+  const stop = useCallback(() => { if (isSupported) { window.speechSynthesis.cancel(); setIsSpeaking(false); setIsPaused(false) } }, [isSupported])
 
-  return { speak, pause, resume, stop, isSpeaking, isPaused, rate, setRate, isSupported, pendingText }
+  // Warm up speech synthesis on any user interaction so future speaks work
+  useEffect(() => {
+    if (!isSupported) return
+    const warmUp = () => {
+      const u = new SpeechSynthesisUtterance('')
+      u.volume = 0
+      try { window.speechSynthesis.speak(u) } catch {}
+    }
+    document.addEventListener('click', warmUp, { once: true })
+    document.addEventListener('touchstart', warmUp, { once: true })
+    return () => {
+      document.removeEventListener('click', warmUp)
+      document.removeEventListener('touchstart', warmUp)
+    }
+  }, [isSupported])
+
+  return { speak, pause, resume, stop, isSpeaking, isPaused, rate, setRate, isSupported }
 }
