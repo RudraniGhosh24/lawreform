@@ -1,9 +1,21 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 
 const LANG_CODES = {
+  Auto: 'en-IN',
   English: 'en-IN',
   Hindi: 'hi-IN',
   Bengali: 'bn-IN',
+  Tamil: 'ta-IN',
+  Telugu: 'te-IN',
+  Kannada: 'kn-IN',
+  Malayalam: 'ml-IN',
+  Marathi: 'mr-IN',
+  Gujarati: 'gu-IN',
+  Punjabi: 'pa-IN',
+  Odia: 'or-IN',
+  Urdu: 'ur-IN',
+  Assamese: 'as-IN',
+  Hinglish: 'hi-IN',
 }
 
 export default function useSpeechRecognition(language = 'English', onSpeechEnd) {

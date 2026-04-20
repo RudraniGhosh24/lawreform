@@ -1,25 +1,21 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 
 const LANG_CONFIG = {
-  English: {
-    codes: ['en-US', 'en'],
-    rate: 0.95,
-    pitch: 1.1,
-    preferred: ['Google US English', 'Microsoft Zira', 'Samantha', 'Karen', 'Victoria', 'Susan'],
-  },
-  Hindi: {
-    codes: ['hi-IN', 'hi'],
-    rate: 0.9,
-    pitch: 1.1,
-    preferred: ['Google हिन्दी', 'Microsoft Kalpana', 'Lekha', 'Swati'],
-  },
-  Bengali: {
-    codes: ['bn-IN', 'bn-BD', 'bn'],
-    rate: 0.85,
-    pitch: 1.1,
-    preferred: ['Google বাংলা', 'Piya', 'Tanishaa'],
-    fallbackCodes: ['hi-IN', 'hi'],
-  },
+  English: { codes: ['en-US', 'en'], rate: 0.95, pitch: 1.1, preferred: ['Google US English', 'Microsoft Zira', 'Samantha', 'Karen', 'Victoria'] },
+  Hindi: { codes: ['hi-IN', 'hi'], rate: 0.9, pitch: 1.1, preferred: ['Google हिन्दी', 'Microsoft Kalpana', 'Lekha', 'Swati'] },
+  Bengali: { codes: ['bn-IN', 'bn-BD', 'bn'], rate: 0.85, pitch: 1.1, preferred: ['Google বাংলা', 'Piya', 'Tanishaa'], fallbackCodes: ['hi-IN'] },
+  Tamil: { codes: ['ta-IN', 'ta'], rate: 0.85, pitch: 1.1, preferred: ['Google தமிழ்'], fallbackCodes: ['en-IN'] },
+  Telugu: { codes: ['te-IN', 'te'], rate: 0.85, pitch: 1.1, preferred: ['Google తెలుగు'], fallbackCodes: ['en-IN'] },
+  Kannada: { codes: ['kn-IN', 'kn'], rate: 0.85, pitch: 1.1, preferred: ['Google ಕನ್ನಡ'], fallbackCodes: ['en-IN'] },
+  Malayalam: { codes: ['ml-IN', 'ml'], rate: 0.85, pitch: 1.1, preferred: ['Google മലയാളം'], fallbackCodes: ['en-IN'] },
+  Marathi: { codes: ['mr-IN', 'mr'], rate: 0.9, pitch: 1.1, preferred: ['Google मराठी'], fallbackCodes: ['hi-IN'] },
+  Gujarati: { codes: ['gu-IN', 'gu'], rate: 0.9, pitch: 1.1, preferred: ['Google ગુજરાતી'], fallbackCodes: ['hi-IN'] },
+  Punjabi: { codes: ['pa-IN', 'pa'], rate: 0.9, pitch: 1.1, preferred: ['Google ਪੰਜਾਬੀ'], fallbackCodes: ['hi-IN'] },
+  Odia: { codes: ['or-IN', 'or'], rate: 0.85, pitch: 1.1, preferred: [], fallbackCodes: ['hi-IN'] },
+  Urdu: { codes: ['ur-IN', 'ur-PK', 'ur'], rate: 0.9, pitch: 1.1, preferred: ['Google اردو'], fallbackCodes: ['hi-IN'] },
+  Assamese: { codes: ['as-IN', 'as'], rate: 0.85, pitch: 1.1, preferred: [], fallbackCodes: ['bn-IN', 'hi-IN'] },
+  Hinglish: { codes: ['en-IN', 'hi-IN'], rate: 0.95, pitch: 1.1, preferred: ['Google India English', 'en-IN'], fallbackCodes: ['en-US'] },
+  Auto: { codes: ['en-US', 'en'], rate: 0.95, pitch: 1.1, preferred: ['Google US English', 'Microsoft Zira', 'Samantha'] },
 }
 
 // Female voice filter

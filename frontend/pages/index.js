@@ -12,19 +12,21 @@ import useSpeechRecognition from '../src/hooks/useSpeechRecognition'
 import useSpeechSynthesis from '../src/hooks/useSpeechSynthesis'
 
 const DISCLAIMER = {
+  Auto: 'Legal information only, not legal advice. For serious matters, contact your DLSA — free legal aid is your right.',
   English: 'Legal information only, not legal advice. For serious matters, contact your DLSA — free legal aid is your right.',
   Hindi: 'केवल कानूनी जानकारी, सलाह नहीं। गंभीर मामलों के लिए DLSA से संपर्क करें — मुफ्त सहायता आपका अधिकार है।',
   Bengali: 'শুধু আইনি তথ্য, পরামর্শ নয়। গুরুতর বিষয়ে DLSA-তে যোগাযোগ করুন — বিনামূল্যে সহায়তা আপনার অধিকার।',
 }
 
 const PLACEHOLDER = {
+  Auto: 'Type or speak in any language...',
   English: 'Type your legal question here...',
   Hindi: 'अपना कानूनी सवाल यहाँ लिखें...',
   Bengali: 'আপনার আইনি প্রশ্ন এখানে লিখুন...',
 }
 
 export default function Home() {
-  const [language, setLanguage] = useState('English')
+  const [language, setLanguage] = useState('Auto')
   const [darkMode, setDarkMode] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [messages, setMessages] = useState([])
