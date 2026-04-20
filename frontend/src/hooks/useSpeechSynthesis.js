@@ -73,10 +73,8 @@ export default function useSpeechSynthesis(language = 'English') {
   const speak = useCallback((text) => {
     if (!isSupported || !text) return
 
-    // Only cancel if WE are currently speaking (not on random touches)
-    if (speakingRef.current) {
-      window.speechSynthesis.cancel()
-    }
+    // Cancel any warm-up utterances, then speak
+    window.speechSynthesis.cancel()
 
     const config = LANG_CONFIG[language] || LANG_CONFIG.English
 

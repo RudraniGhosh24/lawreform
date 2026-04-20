@@ -77,7 +77,6 @@ export default function Home() {
     // Unlock TTS on mobile — must happen synchronously in user gesture
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       try {
-        window.speechSynthesis.cancel()
         const warm = new SpeechSynthesisUtterance('.')
         warm.volume = 0.01
         warm.rate = 10
@@ -168,9 +167,8 @@ export default function Home() {
   }, [input, isLoading, language, messages.length, speech, tts])
 
   const handleSubmit = useCallback((q) => {
-    // Unlock TTS on any submit action
     if (typeof window !== 'undefined' && window.speechSynthesis) {
-      try { window.speechSynthesis.cancel(); const w = new SpeechSynthesisUtterance('.'); w.volume = 0.01; w.rate = 10; window.speechSynthesis.speak(w) } catch {}
+      try { const w = new SpeechSynthesisUtterance('.'); w.volume = 0.01; w.rate = 10; window.speechSynthesis.speak(w) } catch {}
     }
     sendToAPI(q || input.trim(), null)
   }, [input, sendToAPI])
