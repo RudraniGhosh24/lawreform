@@ -1,116 +1,94 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
-const LANG_CODES = {
-  English: 'en-US',
-  Hindi: 'hi-IN',
-  Bengali: 'bn-IN',
-  Tamil: 'ta-IN',
-  Telugu: 'te-IN',
-  Marathi: 'mr-IN',
-  Kannada: 'kn-IN',
-  Gujarati: 'gu-IN',
+const LANG_CONFIG = {
+  English: { codes: ['en-IN', 'en'], rate: 0.95, pitch: 1.1, preferred: ['Google India English Female', 'Microsoft Heera', 'Veena', 'Lekha', 'Google India English'] },
+  Hindi: { codes: ['hi-IN', 'hi'], rate: 0.9, pitch: 1.1, preferred: ['Google हिन्दी', 'Microsoft Kalpana', 'Lekha', 'Swati'] },
+  Bengali: { codes: ['bn-IN', 'bn-BD', 'bn'], rate: 0.85, pitch: 1.1, preferred: ['Google বাংলা', 'Piya', 'Tanishaa'], fallbackCodes: ['hi-IN', 'hi'] },
+  Tamil: { codes: ['ta-IN', 'ta'], rate: 0.85, pitch: 1.1, preferred: ['Google தமிழ்'], fallbackCodes: ['en-IN'] },
+  Telugu: { codes: ['te-IN', 'te'], rate: 0.85, pitch: 1.1, preferred: ['Google తెలుగు'], fallbackCodes: ['en-IN'] },
+  Marathi: { codes: ['mr-IN', 'mr'], rate: 0.85, pitch: 1.1, preferred: ['Google मराठी'], fallbackCodes: ['hi-IN'] },
+  Kannada: { codes: ['kn-IN', 'kn'], rate: 0.85, pitch: 1.1, preferred: ['Google ಕನ್ನಡ'], fallbackCodes: ['en-IN'] },
+  Gujarati: { codes: ['gu-IN', 'gu'], rate: 0.85, pitch: 1.1, preferred: ['Google ગુજરાતી'], fallbackCodes: ['hi-IN'] },
 }
 
 export default function useSpeechSynthesis(language = 'English') {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
   const [rate, setRate] = useState(1)
-  const voicesRef = useRef([])
-  const resumeTimer = useRef(null)
+  const [voices, setVoices] = useState([])
+  const utteranceRef = useRef(null)
+  const speakingRef = useRef(false)
 
   const isSupported = typeof window !== 'undefined' && 'speechSynthesis' in window
 
-  // Load voices eagerly on mount — so they're ready when speak is called
   useEffect(() => {
     if (!isSupported) return
-    const load = () => {
-      const v = window.speechSynthesis.getVoices()
-      if (v.length > 0) voicesRef.current = v
-    }
+    const load = () => { const v = window.speechSynthesis.getVoices(); if (v.length) setVoices(v) }
     load()
-    window.speechSynthesis.addEventListener('voiceschanged', load)
-    return () => window.speechSynthesis.removeEventListener('voiceschanged', load)
+    window.speechSynthesis.onvoiceschanged = load
+    return () => { window.speechSynthesis.onvoiceschanged = null }
   }, [isSupported])
 
-  // Chrome Mac keep-alive hack
-  const startKeepAlive = useCallback(() => {
-    if (resumeTimer.current) clearInterval(resumeTimer.current)
-    resumeTimer.current = setInterval(() => {
-      if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.pause()
-        window.speechSynthesis.resume()
+  const getVoice = useCallback(() => {
+    if (voices.length === 0) return null
+    const config = LANG_CONFIG[language] || LANG_CONFIG.English
+    for (const name of config.preferred) {
+      const m = voices.find(v => v.name.includes(name))
+      if (m) return m
+    }
+    for (const code of config.codes) {
+      const r = voices.find(v => v.lang === code && !v.localService)
+      if (r) return r
+      const l = voices.find(v => v.lang === code)
+      if (l) return l
+    }
+    const prefix = config.codes[0].split('-')[0]
+    const p = voices.find(v => v.lang.startsWith(prefix))
+    if (p) return p
+    if (config.fallbackCodes) {
+      for (const code of config.fallbackCodes) {
+        const f = voices.find(v => v.lang === code)
+        if (f) return f
       }
-    }, 5000)
-  }, [])
+    }
+    return null
+  }, [language, voices])
 
-  const stopKeepAlive = useCallback(() => {
-    if (resumeTimer.current) { clearInterval(resumeTimer.current); resumeTimer.current = null }
-  }, [])
-
-  useEffect(() => () => stopKeepAlive(), [stopKeepAlive])
-
-  // SYNCHRONOUS speak — no async, no await, works in click handlers on all browsers
   const speak = useCallback((text) => {
     if (!isSupported || !text) return
-
-    const synth = window.speechSynthesis
-
-    // If voices aren't loaded yet, try one more time
-    if (voicesRef.current.length === 0) {
-      voicesRef.current = synth.getVoices()
+    if (speakingRef.current) {
+      window.speechSynthesis.cancel()
     }
-
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = LANG_CODES[language] || 'en-US'
-    utterance.rate = rate || 0.9
-    utterance.pitch = 1.1
-
-    // Pick a female voice — prefer Google or Samantha voices
-    const voices = voicesRef.current
-    if (voices.length > 0) {
-      const prefix = (LANG_CODES[language] || 'en-US').split('-')[0]
-      const langVoices = voices.filter(v => v.lang.startsWith(prefix))
-      
-      // Prefer known good female voices
-      const goodNames = ['samantha', 'karen', 'victoria', 'susan', 'fiona', 'moira', 'tessa', 'google', 'microsoft', 'kalpana', 'lekha', 'swati']
-      const good = langVoices.find(v => goodNames.some(n => v.name.toLowerCase().includes(n)))
-      if (good) {
-        utterance.voice = good
-      } else {
-        // Pick first non-novelty voice for this language
-        const normal = langVoices.find(v => 
-          !/\b(bad news|bells|boing|bubbles|cellos|good news|hysterical|junior|organ|superstar|trinoids|whisper|wobble|zarvox|albert|ralph|fred)\b/i.test(v.name) &&
-          !/\b(ravi|hemant|david|james|rishi|kumar|raj|daniel|thomas|george|aaron)\b/i.test(v.name)
-        )
-        if (normal) utterance.voice = normal
-        else if (langVoices.length > 0) utterance.voice = langVoices[0]
-      }
+    const config = LANG_CONFIG[language] || LANG_CONFIG.English
+    const sentences = text.match(/[^.!?।]+[.!?।]?\s*/g) || [text]
+    const chunks = []
+    let cur = ''
+    for (const s of sentences) {
+      if ((cur + s).length > 200 && cur) { chunks.push(cur.trim()); cur = s }
+      else cur += s
     }
-
-    utterance.onstart = () => { setIsSpeaking(true); setIsPaused(false); startKeepAlive() }
-    utterance.onend = () => { setIsSpeaking(false); setIsPaused(false); stopKeepAlive() }
-    utterance.onerror = () => { setIsSpeaking(false); setIsPaused(false); stopKeepAlive() }
-
-    // DO NOT call cancel() before speak on Mac Chrome — it kills the user gesture
-    synth.speak(utterance)
-  }, [language, rate, isSupported, startKeepAlive, stopKeepAlive])
-
-  const pause = useCallback(() => {
-    if (isSupported) { window.speechSynthesis.pause(); setIsPaused(true) }
-  }, [isSupported])
-
-  const resume = useCallback(() => {
-    if (isSupported) { window.speechSynthesis.resume(); setIsPaused(false) }
-  }, [isSupported])
-
-  const stop = useCallback(() => {
-    if (isSupported) {
-      // Use pause first, then cancel after a tick (Mac Chrome compat)
-      window.speechSynthesis.pause()
-      setTimeout(() => window.speechSynthesis.cancel(), 50)
-      setIsSpeaking(false); setIsPaused(false); stopKeepAlive()
+    if (cur.trim()) chunks.push(cur.trim())
+    let i = 0
+    const next = () => {
+      if (i >= chunks.length) { speakingRef.current = false; setIsSpeaking(false); setIsPaused(false); return }
+      const u = new SpeechSynthesisUtterance(chunks[i])
+      u.lang = config.codes[0]
+      u.rate = rate !== 1 ? rate : config.rate
+      u.pitch = config.pitch
+      const voice = getVoice()
+      if (voice) { u.voice = voice; u.lang = voice.lang }
+      u.onstart = () => { speakingRef.current = true; setIsSpeaking(true); setIsPaused(false) }
+      u.onend = () => { i++; next() }
+      u.onerror = () => { speakingRef.current = false; setIsSpeaking(false); setIsPaused(false) }
+      utteranceRef.current = u
+      window.speechSynthesis.speak(u)
     }
-  }, [isSupported, stopKeepAlive])
+    next()
+  }, [language, rate, getVoice, isSupported])
+
+  const pause = useCallback(() => { if (isSupported) { window.speechSynthesis.pause(); setIsPaused(true) } }, [isSupported])
+  const resume = useCallback(() => { if (isSupported) { window.speechSynthesis.resume(); setIsPaused(false) } }, [isSupported])
+  const stop = useCallback(() => { if (isSupported) { window.speechSynthesis.cancel(); speakingRef.current = false; setIsSpeaking(false); setIsPaused(false) } }, [isSupported])
 
   return { speak, pause, resume, stop, isSpeaking, isPaused, rate, setRate, isSupported }
 }
