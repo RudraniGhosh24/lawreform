@@ -14,44 +14,57 @@ export default function TestAudio() {
     }
 
     addLog('speechSynthesis exists: true')
-    addLog('speaking: ' + window.speechSynthesis.speaking)
-    addLog('paused: ' + window.speechSynthesis.paused)
-    addLog('pending: ' + window.speechSynthesis.pending)
 
-    const voices = window.speechSynthesis.getVoices()
-    addLog('voices count: ' + voices.length)
-    if (voices.length > 0) {
-      addLog('first 5 voices: ' + voices.slice(0, 5).map(v => v.name + ' (' + v.lang + ')').join(', '))
-    }
+    // Force voice loading first
+    let voices = window.speechSynthesis.getVoices()
+    addLog('voices count (immediate): ' + voices.length)
 
-    window.speechSynthesis.cancel()
-
-    const u = new SpeechSynthesisUtterance('Hello, this is a test of the speech system.')
-    u.lang = 'en-US'
-    u.rate = 1
-    u.pitch = 1
-
-    if (voices.length > 0) {
-      const enVoice = voices.find(v => v.lang.startsWith('en'))
-      if (enVoice) {
-        u.voice = enVoice
-        addLog('using voice: ' + enVoice.name)
+    const doSpeak = (v) => {
+      addLog('voices count (final): ' + v.length)
+      if (v.length > 0) {
+        addLog('first 5 voices: ' + v.slice(0, 5).map(x => x.name + ' (' + x.lang + ')').join(', '))
       }
+
+      window.speechSynthesis.cancel()
+
+      const u = new SpeechSynthesisUtterance('Hello, this is a test of the speech system.')
+      u.lang = 'en-US'
+
+      if (v.length > 0) {
+        const enVoice = v.find(x => x.lang.startsWith('en'))
+        if (enVoice) {
+          u.voice = enVoice
+          addLog('using voice: ' + enVoice.name + ' (' + enVoice.lang + ')')
+        }
+      }
+
+      u.onstart = () => addLog('EVENT: onstart fired')
+      u.onend = () => addLog('EVENT: onend fired')
+      u.onerror = (e) => addLog('EVENT: onerror - ' + e.error)
+
+      addLog('calling speak()...')
+      window.speechSynthesis.speak(u)
+      addLog('speak() called')
     }
 
-    u.onstart = () => addLog('EVENT: onstart fired')
-    u.onend = () => addLog('EVENT: onend fired')
-    u.onerror = (e) => addLog('EVENT: onerror - ' + e.error)
-    u.onpause = () => addLog('EVENT: onpause fired')
-    u.onresume = () => addLog('EVENT: onresume fired')
-
-    addLog('calling speak()...')
-    window.speechSynthesis.speak(u)
-    addLog('speak() called. speaking: ' + window.speechSynthesis.speaking + ', pending: ' + window.speechSynthesis.pending)
-
-    setTimeout(() => {
-      addLog('after 500ms - speaking: ' + window.speechSynthesis.speaking + ', paused: ' + window.speechSynthesis.paused)
-    }, 500)
+    if (voices.length > 0) {
+      doSpeak(voices)
+    } else {
+      addLog('waiting for voiceschanged event...')
+      window.speechSynthesis.onvoiceschanged = () => {
+        voices = window.speechSynthesis.getVoices()
+        addLog('voiceschanged fired! count: ' + voices.length)
+        doSpeak(voices)
+      }
+      // Also try after a delay
+      setTimeout(() => {
+        const v2 = window.speechSynthesis.getVoices()
+        if (v2.length > 0 && voices.length === 0) {
+          addLog('voices loaded via timeout: ' + v2.length)
+          doSpeak(v2)
+        }
+      }, 2000)
+    }
   }
 
   return (
