@@ -12,21 +12,39 @@ import useSpeechRecognition from '../src/hooks/useSpeechRecognition'
 import useSpeechSynthesis from '../src/hooks/useSpeechSynthesis'
 
 const DISCLAIMER = {
-  Auto: 'Legal information only, not legal advice. For serious matters, contact your DLSA — free legal aid is your right.',
   English: 'Legal information only, not legal advice. For serious matters, contact your DLSA — free legal aid is your right.',
-  Hindi: 'केवल कानूनी जानकारी, सलाह नहीं। गंभीर मामलों के लिए DLSA से संपर्क करें — मुफ्त सहायता आपका अधिकार है।',
-  Bengali: 'শুধু আইনি তথ্য, পরামর্শ নয়। গুরুতর বিষয়ে DLSA-তে যোগাযোগ করুন — বিনামূল্যে সহায়তা আপনার অধিকার।',
+  Hindi: 'केवल कानूनी जानकारी, सलाह नहीं। गंभीर मामलों के लिए DLSA से संपर्क करें।',
+  Bengali: 'শুধু আইনি তথ্য, পরামর্শ নয়। গুরুতর বিষয়ে DLSA-তে যোগাযোগ করুন।',
+  Tamil: 'சட்டத் தகவல் மட்டுமே, ஆலோசனை அல்ல। தீவிர விஷயங்களுக்கு DLSA தொடர்பு கொள்ளுங்கள்.',
+  Telugu: 'చట్టపరమైన సమాచారం మాత్రమే. తీవ్రమైన విషయాలకు DLSA సంప్రదించండి.',
+  Marathi: 'केवळ कायदेशीर माहिती. गंभीर प्रकरणांसाठी DLSA शी संपर्क साधा.',
+  Gujarati: 'માત્ર કાનૂની માહિતી. ગંભીર બાબતો માટે DLSA નો સંપર્ક કરો.',
+  Kannada: 'ಕಾನೂನು ಮಾಹಿತಿ ಮಾತ್ರ. ಗಂಭೀರ ವಿಷಯಗಳಿಗೆ DLSA ಸಂಪರ್ಕಿಸಿ.',
+  Malayalam: 'നിയമ വിവരങ്ങൾ മാത്രം. ഗുരുതരമായ കാര്യങ്ങൾക്ക് DLSA ബന്ധപ്പെടുക.',
+  Punjabi: 'ਸਿਰਫ਼ ਕਾਨੂੰਨੀ ਜਾਣਕਾਰੀ। ਗੰਭੀਰ ਮਾਮਲਿਆਂ ਲਈ DLSA ਨਾਲ ਸੰਪਰਕ ਕਰੋ।',
+  Odia: 'କେବଳ ଆଇନଗତ ସୂଚନା। ଗୁରୁତର ବିଷୟ ପାଇଁ DLSA ସହ ଯୋଗାଯୋଗ କରନ୍ତୁ।',
+  Assamese: 'কেৱল আইনী তথ্য। গুৰুতৰ বিষয়ত DLSA যোগাযোগ কৰক।',
+  Urdu: 'صرف قانونی معلومات۔ سنگین معاملات کے لیے DLSA سے رابطہ کریں۔',
 }
 
 const PLACEHOLDER = {
-  Auto: 'Type or speak in any language...',
   English: 'Type your legal question here...',
   Hindi: 'अपना कानूनी सवाल यहाँ लिखें...',
   Bengali: 'আপনার আইনি প্রশ্ন এখানে লিখুন...',
+  Tamil: 'உங்கள் சட்ட கேள்வியை இங்கே தட்டச்சு செய்யுங்கள்...',
+  Telugu: 'మీ చట్టపరమైన ప్రశ్నను ఇక్కడ టైప్ చేయండి...',
+  Marathi: 'तुमचा कायदेशीर प्रश्न येथे टाइप करा...',
+  Gujarati: 'તમારો કાનૂની પ્રશ્ન અહીં ટાઈપ કરો...',
+  Kannada: 'ನಿಮ್ಮ ಕಾನೂನು ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ...',
+  Malayalam: 'നിങ്ങളുടെ നിയമ ചോദ്യം ഇവിടെ ടൈപ്പ് ചെയ്യുക...',
+  Punjabi: 'ਆਪਣਾ ਕਾਨੂੰਨੀ ਸਵਾਲ ਇੱਥੇ ਟਾਈਪ ਕਰੋ...',
+  Odia: 'ଆପଣଙ୍କ ଆଇନଗତ ପ୍ରଶ୍ନ ଏଠାରେ ଟାଇପ୍ କରନ୍ତୁ...',
+  Assamese: 'আপোনাৰ আইনী প্ৰশ্ন ইয়াত টাইপ কৰক...',
+  Urdu: 'اپنا قانونی سوال یہاں ٹائپ کریں...',
 }
 
 export default function Home() {
-  const [language, setLanguage] = useState('Auto')
+  const [language, setLanguage] = useState('English')
   const [darkMode, setDarkMode] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [messages, setMessages] = useState([])
@@ -55,18 +73,6 @@ export default function Home() {
     document.documentElement.classList.toggle('dark', darkMode)
   }, [darkMode])
 
-  // Unlock TTS on first touch/click (mobile requirement)
-  useEffect(() => {
-    const unlock = () => {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        try { const w = new SpeechSynthesisUtterance('.'); w.volume = 0.01; w.rate = 10; window.speechSynthesis.speak(w) } catch {}
-      }
-    }
-    document.addEventListener('touchstart', unlock, { once: true })
-    document.addEventListener('click', unlock, { once: true })
-    return () => { document.removeEventListener('touchstart', unlock); document.removeEventListener('click', unlock) }
-  }, [])
-
   useEffect(() => {
     if (speech.transcript) setInput(speech.transcript)
   }, [speech.transcript])
@@ -74,20 +80,12 @@ export default function Home() {
   const sendToAPI = useCallback(async (question, imageData) => {
     if ((!question && !imageData) || isLoading) return
 
-    // IMMEDIATELY speak a short phrase to unlock audio on macOS/Safari
-    // This MUST happen synchronously in the user gesture handler
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
+    // Pre-warm TTS on user gesture (mobile needs this)
+    if (tts.isSupported) {
       try {
-        window.speechSynthesis.cancel()
-        const unlock = new SpeechSynthesisUtterance('Let me look into that for you.')
-        unlock.rate = 1.0
-        unlock.pitch = 1.1
-        unlock.volume = 1
-        const voices = window.speechSynthesis.getVoices()
-        const femaleUS = voices.find(v => v.lang.startsWith('en') && !/male|ravi|david|james|rishi/i.test(v.name))
-        if (femaleUS) { unlock.voice = femaleUS; unlock.lang = femaleUS.lang }
-        else { unlock.lang = 'en-US' }
-        window.speechSynthesis.speak(unlock)
+        const warm = new SpeechSynthesisUtterance(' ')
+        warm.volume = 0
+        window.speechSynthesis.speak(warm)
       } catch {}
     }
 
@@ -147,8 +145,8 @@ export default function Home() {
         }
       }
 
-      // Auto-play TTS — always, on all devices, all input types
-      if (fullResponse) {
+      // Auto-play TTS
+      if (fullResponse && tts.isSupported) {
         const numToWords = (n) => {
           const ones = ['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen']
           const tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety']
@@ -163,12 +161,7 @@ export default function Home() {
           return numToWords(String(Math.floor(num/10000000))) + ' crore' + (num%10000000 ? ' ' + numToWords(String(num%10000000)) : '')
         }
         const clean = fullResponse.replace(/\[([^\]]+)\]/g, '').replace(/[📜✨→•*#_~`|]/g, '').replace(/https?:\/\/\S+/g, '').replace(/₹\s?(\d[\d,]*)/g, (_, n) => 'rupees ' + numToWords(n.replace(/,/g, ''))).replace(/\b(\d[\d,]+)\b/g, (_, n) => numToWords(n.replace(/,/g, ''))).replace(/\n+/g, '. ').replace(/\s{2,}/g, ' ').replace(/\.\s*\./g, '.').trim()
-        // Delay slightly to let warm-up utterance clear
-        setTimeout(() => {
-          if (typeof window !== 'undefined' && window.speechSynthesis) {
-            tts.speak(clean)
-          }
-        }, 200)
+        tts.speak(clean)
       }
     } catch {
       setMessages(prev => { const u = [...prev]; u[u.length - 1] = { role: 'assistant', content: '⚠️ Sorry, could not connect. Please try again.' }; return u })
@@ -178,12 +171,7 @@ export default function Home() {
     }
   }, [input, isLoading, language, messages.length, speech, tts])
 
-  const handleSubmit = useCallback((q) => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      try { const w = new SpeechSynthesisUtterance('.'); w.volume = 0.01; w.rate = 10; window.speechSynthesis.speak(w) } catch {}
-    }
-    sendToAPI(q || input.trim(), null)
-  }, [input, sendToAPI])
+  const handleSubmit = useCallback((q) => { sendToAPI(q || input.trim(), null) }, [input, sendToAPI])
   const handleDocUpload = useCallback((img) => { sendToAPI(input.trim() || 'Analyze this document and explain my legal rights.', img) }, [input, sendToAPI])
   const handleKeyDown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit() } }
   const handleMicToggle = () => { speech.isListening ? speech.stopListening() : (speech.resetTranscript(), speech.startListening()) }
@@ -192,10 +180,7 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <title>LawReformer AI — Free Legal Rights Assistant for India | Know Your Rights</title>
-        <meta property="og:title" content="LawReformer AI — Know Your Legal Rights in India" />
-      </Head>
+      <Head><title>LawReformer AI — Know Your Rights</title></Head>
       <div className="flex flex-col h-screen bg-surface dark:bg-[#0f0a1a]">
         <Header language={language} setLanguage={setLanguage} onAboutClick={() => setAboutOpen(true)} darkMode={darkMode} setDarkMode={setDarkMode} />
 

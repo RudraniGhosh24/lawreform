@@ -1,21 +1,19 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 
 const LANG_CODES = {
-  Auto: '', // empty = browser default, usually picks up multiple languages
   English: 'en-IN',
   Hindi: 'hi-IN',
   Bengali: 'bn-IN',
   Tamil: 'ta-IN',
   Telugu: 'te-IN',
-  Kannada: 'kn-IN',
-  Malayalam: 'ml-IN',
   Marathi: 'mr-IN',
   Gujarati: 'gu-IN',
+  Kannada: 'kn-IN',
+  Malayalam: 'ml-IN',
   Punjabi: 'pa-IN',
   Odia: 'or-IN',
-  Urdu: 'ur-IN',
   Assamese: 'as-IN',
-  Hinglish: 'hi-IN',
+  Urdu: 'ur-IN',
 }
 
 export default function useSpeechRecognition(language = 'English', onSpeechEnd) {
@@ -44,12 +42,10 @@ export default function useSpeechRecognition(language = 'English', onSpeechEnd) 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     const recognition = new SpeechRecognition()
 
-    // Auto mode: don't set lang so browser uses device default (picks up multiple languages)
-    const langCode = LANG_CODES[language]
-    if (langCode) recognition.lang = langCode
+    recognition.lang = LANG_CODES[language] || 'en-IN'
     recognition.continuous = !/Android|iPhone|iPad/i.test(navigator.userAgent)
     recognition.interimResults = true
-    recognition.maxAlternatives = 3
+    recognition.maxAlternatives = 1
 
     recognition.onstart = () => setIsListening(true)
 
