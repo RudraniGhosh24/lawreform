@@ -73,8 +73,9 @@ export default function useSpeechSynthesis(language = 'English') {
   const speak = useCallback((text) => {
     if (!isSupported || !text) return
 
-    // Cancel any warm-up utterances, then speak
+    // Cancel any existing speech, then start new after a tick
     window.speechSynthesis.cancel()
+    speakingRef.current = false
 
     const config = LANG_CONFIG[language] || LANG_CONFIG.English
 

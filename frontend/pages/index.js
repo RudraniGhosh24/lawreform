@@ -140,8 +140,8 @@ export default function Home() {
         }
       }
 
-      // Auto-play TTS
-      if (fullResponse && tts.isSupported) {
+      // Auto-play TTS — always, on all devices, all input types
+      if (fullResponse) {
         const numToWords = (n) => {
           const ones = ['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen']
           const tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety']
@@ -156,7 +156,12 @@ export default function Home() {
           return numToWords(String(Math.floor(num/10000000))) + ' crore' + (num%10000000 ? ' ' + numToWords(String(num%10000000)) : '')
         }
         const clean = fullResponse.replace(/\[([^\]]+)\]/g, '').replace(/[📜✨→•*#_~`|]/g, '').replace(/https?:\/\/\S+/g, '').replace(/₹\s?(\d[\d,]*)/g, (_, n) => 'rupees ' + numToWords(n.replace(/,/g, ''))).replace(/\b(\d[\d,]+)\b/g, (_, n) => numToWords(n.replace(/,/g, ''))).replace(/\n+/g, '. ').replace(/\s{2,}/g, ' ').replace(/\.\s*\./g, '.').trim()
-        tts.speak(clean)
+        // Delay slightly to let warm-up utterance clear
+        setTimeout(() => {
+          if (typeof window !== 'undefined' && window.speechSynthesis) {
+            tts.speak(clean)
+          }
+        }, 200)
       }
     } catch {
       setMessages(prev => { const u = [...prev]; u[u.length - 1] = { role: 'assistant', content: '⚠️ Sorry, could not connect. Please try again.' }; return u })
