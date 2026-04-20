@@ -15,16 +15,11 @@ const DISCLAIMER = {
   English: 'Legal information only, not legal advice. For serious matters, contact your DLSA — free legal aid is your right.',
   Hindi: 'केवल कानूनी जानकारी, सलाह नहीं। गंभीर मामलों के लिए DLSA से संपर्क करें।',
   Bengali: 'শুধু আইনি তথ্য, পরামর্শ নয়। গুরুতর বিষয়ে DLSA-তে যোগাযোগ করুন।',
-  Tamil: 'சட்டத் தகவல் மட்டுமே, ஆலோசனை அல்ல। தீவிர விஷயங்களுக்கு DLSA தொடர்பு கொள்ளுங்கள்.',
-  Telugu: 'చట్టపరమైన సమాచారం మాత్రమే. తీవ్రమైన విషయాలకు DLSA సంప్రదించండి.',
-  Marathi: 'केवळ कायदेशीर माहिती. गंभीर प्रकरणांसाठी DLSA शी संपर्क साधा.',
-  Gujarati: 'માત્ર કાનૂની માહિતી. ગંભીર બાબતો માટે DLSA નો સંપર્ક કરો.',
-  Kannada: 'ಕಾನೂನು ಮಾಹಿತಿ ಮಾತ್ರ. ಗಂಭೀರ ವಿಷಯಗಳಿಗೆ DLSA ಸಂಪರ್ಕಿಸಿ.',
-  Malayalam: 'നിയമ വിവരങ്ങൾ മാത്രം. ഗുരുതരമായ കാര്യങ്ങൾക്ക് DLSA ബന്ധപ്പെടുക.',
-  Punjabi: 'ਸਿਰਫ਼ ਕਾਨੂੰਨੀ ਜਾਣਕਾਰੀ। ਗੰਭੀਰ ਮਾਮਲਿਆਂ ਲਈ DLSA ਨਾਲ ਸੰਪਰਕ ਕਰੋ।',
-  Odia: 'କେବଳ ଆଇନଗତ ସୂଚନା। ଗୁରୁତର ବିଷୟ ପାଇଁ DLSA ସହ ଯୋଗାଯୋଗ କରନ୍ତୁ।',
-  Assamese: 'কেৱল আইনী তথ্য। গুৰুতৰ বিষয়ত DLSA যোগাযোগ কৰক।',
-  Urdu: 'صرف قانونی معلومات۔ سنگین معاملات کے لیے DLSA سے رابطہ کریں۔',
+  Tamil: 'சட்டத் தகவல் மட்டுமே, சட்ட ஆலோசனை அல்ல। தீவிர விஷயங்களுக்கு DLSA-ஐ தொடர்பு கொள்ளுங்கள்.',
+  Telugu: 'చట్టపరమైన సమాచారం మాత్రమే, చట్టపరమైన సలహా కాదు. తీవ్రమైన విషయాలకు DLSA సంప్రదించండి.',
+  Marathi: 'केवळ कायदेशीर माहिती, सल्ला नाही. गंभीर प्रकरणांसाठी DLSA शी संपर्क साधा.',
+  Kannada: 'ಕಾನೂನು ಮಾಹಿತಿ ಮಾತ್ರ, ಕಾನೂನು ಸಲಹೆ ಅಲ್ಲ. ಗಂಭೀರ ವಿಷಯಗಳಿಗೆ DLSA ಸಂಪರ್ಕಿಸಿ.',
+  Gujarati: 'માત્ર કાનૂની માહિતી, સલાહ નહીં. ગંભીર બાબતો માટે DLSA નો સંપર્ક કરો.',
 }
 
 const PLACEHOLDER = {
@@ -34,13 +29,8 @@ const PLACEHOLDER = {
   Tamil: 'உங்கள் சட்ட கேள்வியை இங்கே தட்டச்சு செய்யுங்கள்...',
   Telugu: 'మీ చట్టపరమైన ప్రశ్నను ఇక్కడ టైప్ చేయండి...',
   Marathi: 'तुमचा कायदेशीर प्रश्न येथे टाइप करा...',
-  Gujarati: 'તમારો કાનૂની પ્રશ્ન અહીં ટાઈપ કરો...',
   Kannada: 'ನಿಮ್ಮ ಕಾನೂನು ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ...',
-  Malayalam: 'നിങ്ങളുടെ നിയമ ചോദ്യം ഇവിടെ ടൈപ്പ് ചെയ്യുക...',
-  Punjabi: 'ਆਪਣਾ ਕਾਨੂੰਨੀ ਸਵਾਲ ਇੱਥੇ ਟਾਈਪ ਕਰੋ...',
-  Odia: 'ଆପଣଙ୍କ ଆଇନଗତ ପ୍ରଶ୍ନ ଏଠାରେ ଟାଇପ୍ କରନ୍ତୁ...',
-  Assamese: 'আপোনাৰ আইনী প্ৰশ্ন ইয়াত টাইপ কৰক...',
-  Urdu: 'اپنا قانونی سوال یہاں ٹائپ کریں...',
+  Gujarati: 'તમારો કાનૂની પ્રશ્ન અહીં ટાઇપ કરો...',
 }
 
 export default function Home() {
@@ -80,13 +70,13 @@ export default function Home() {
   const sendToAPI = useCallback(async (question, imageData) => {
     if ((!question && !imageData) || isLoading) return
 
-    // CRITICAL: Warm up speechSynthesis during user gesture so it works after async fetch
-    if (tts.isSupported && window.speechSynthesis) {
-      window.speechSynthesis.cancel()
-      const warmup = new SpeechSynthesisUtterance('.')
-      warmup.volume = 0.01
-      warmup.rate = 10
-      window.speechSynthesis.speak(warmup)
+    // Pre-warm TTS on user gesture (mobile needs this)
+    if (tts.isSupported) {
+      try {
+        const warm = new SpeechSynthesisUtterance(' ')
+        warm.volume = 0
+        window.speechSynthesis.speak(warm)
+      } catch {}
     }
 
     speech.stopListening()
@@ -186,9 +176,8 @@ export default function Home() {
 
         <main className="flex-1 flex flex-col overflow-hidden max-w-5xl w-full mx-auto">
           {hasMessages ? (
-            <>
-              <ChatWindow messages={messages} language={language} streamingIndex={streamingIndex} isSpeaking={tts.isSpeaking} />
-            </>
+            /* ===== CHAT VIEW — avatar scrolls with messages ===== */
+            <ChatWindow messages={messages} language={language} streamingIndex={streamingIndex} isSpeaking={tts.isSpeaking} />
           ) : (
             /* ===== HOME VIEW — compact, content-first ===== */
             <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 sm:py-6 gap-3 sm:gap-4 overflow-y-auto">
@@ -196,7 +185,7 @@ export default function Home() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-900/30 border border-brand-200 dark:border-brand-800">
                 <span className="text-xs">⚖️</span>
                 <span className="text-xs font-medium text-brand-700 dark:text-brand-300">
-                  {language === 'Hindi' ? 'AI कानूनी सहायक' : language === 'Bengali' ? 'AI আইনি সহায়ক' : 'AI Legal Rights Assistant'}
+                  {{ English: 'AI Legal Rights Assistant', Hindi: 'AI कानूनी सहायक', Bengali: 'AI আইনি সহায়ক', Tamil: 'AI சட்ட உதவியாளர்', Telugu: 'AI చట్ట సహాయకుడు', Marathi: 'AI कायदेशीर सहाय्यक', Kannada: 'AI ಕಾನೂನು ಸಹಾಯಕ', Gujarati: 'AI કાનૂની સહાયક' }[language] || 'AI Legal Rights Assistant'}
                 </span>
                 <span className="text-[9px] bg-brand-200 dark:bg-brand-800 text-brand-800 dark:text-brand-200 px-1.5 py-0.5 rounded-full font-medium">Gemma 4</span>
               </div>
@@ -204,10 +193,10 @@ export default function Home() {
               {/* Heading */}
               <div className="text-center space-y-1">
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text dark:text-white">
-                  {language === 'Hindi' ? 'अपने अधिकार जानें।' : language === 'Bengali' ? 'আপনার অধিকার জানুন।' : 'Know Your Rights.'}
+                  {{ English: 'Know Your Rights.', Hindi: 'अपने अधिकार जानें।', Bengali: 'আপনার অধিকার জানুন।', Tamil: 'உங்கள் உரிமைகளை அறியுங்கள்.', Telugu: 'మీ హక్కులు తెలుసుకోండి.', Marathi: 'तुमचे हक्क जाणा.', Kannada: 'ನಿಮ್ಮ ಹಕ್ಕುಗಳನ್ನು ತಿಳಿಯಿರಿ.', Gujarati: 'તમારા અધિકારો જાણો.' }[language] || 'Know Your Rights.'}
                 </h2>
                 <p className="text-lg sm:text-xl font-bold bg-gradient-to-r from-brand-500 to-brand-700 bg-clip-text text-transparent">
-                  {language === 'Hindi' ? 'अपनी आवाज़ में पूछें।' : language === 'Bengali' ? 'আপনার ভাষায় জিজ্ঞাসা করুন।' : 'Ask in Your Voice.'}
+                  {{ English: 'Ask in Your Voice.', Hindi: 'अपनी आवाज़ में पूछें।', Bengali: 'আপনার ভাষায় জিজ্ঞাসা করুন।', Tamil: 'உங்கள் குரலில் கேளுங்கள்.', Telugu: 'మీ గొంతులో అడగండి.', Marathi: 'तुमच्या आवाजात विचारा.', Kannada: 'ನಿಮ್ಮ ಧ್ವನಿಯಲ್ಲಿ ಕೇಳಿ.', Gujarati: 'તમારા અવાજમાં પૂછો.' }[language] || 'Ask in Your Voice.'}
                 </p>
               </div>
 
@@ -218,7 +207,7 @@ export default function Home() {
                   <VoiceButton isListening={speech.isListening} onToggle={handleMicToggle} isSupported={speech.isSupported} />
                   {speech.isListening && (
                     <p className="text-xs text-brand-600 animate-pulse">
-                      {language === 'Hindi' ? '🎙️ सुन रहा हूँ...' : language === 'Bengali' ? '🎙️ শুনছি...' : '🎙️ Listening...'}
+                      {{ English: '🎙️ Listening...', Hindi: '🎙️ सुन रहा हूँ...', Bengali: '🎙️ শুনছি...', Tamil: '🎙️ கேட்கிறேன்...', Telugu: '🎙️ వింటున్నాను...', Marathi: '🎙️ ऐकत आहे...', Kannada: '🎙️ ಕೇಳುತ್ತಿದ್ದೇನೆ...', Gujarati: '🎙️ સાંભળી રહ્યું છે...' }[language] || '🎙️ Listening...'}
                     </p>
                   )}
                 </div>
