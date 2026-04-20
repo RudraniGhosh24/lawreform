@@ -62,31 +62,27 @@ export default function useSpeechSynthesis(language = 'English') {
 
   const speak = useCallback((text) => {
     if (!isSupported || !text) return
-    if (speakingRef.current) window.speechSynthesis.cancel()
+    window.speechSynthesis.cancel()
+    speakingRef.current = false
+
     const config = LANG_CONFIG[language] || LANG_CONFIG.English
-    const sentences = text.match(/[^.!?।]+[.!?।]?\s*/g) || [text]
-    const chunks = []
-    let cur = ''
-    for (const s of sentences) {
-      if ((cur + s).length > 200 && cur) { chunks.push(cur.trim()); cur = s } else cur += s
-    }
-    if (cur.trim()) chunks.push(cur.trim())
-    let idx = 0
-    const next = () => {
-      if (idx >= chunks.length) { speakingRef.current = false; setIsSpeaking(false); setIsPaused(false); return }
-      const u = new SpeechSynthesisUtterance(chunks[idx])
-      u.lang = config.codes[0]
-      u.rate = rate !== 1 ? rate : config.rate
-      u.pitch = config.pitch
-      const voice = getVoice()
-      if (voice) { u.voice = voice; u.lang = voice.lang }
-      u.onstart = () => { speakingRef.current = true; setIsSpeaking(true); setIsPaused(false) }
-      u.onend = () => { idx++; next() }
-      u.onerror = () => { speakingRef.current = false; setIsSpeaking(false); setIsPaused(false) }
-      utteranceRef.current = u
-      window.speechSynthesis.speak(u)
-    }
-    next()
+
+    // Simple single utterance — no chunking, more reliable
+    const u = new SpeechSynthesisUtterance(text.slice(0, 500))
+    u.lang = config.codes[0]
+    u.rate = rate !== 1 ? rate : config.rate
+    u.pitch = config.pitch
+
+    // Try to find a female voice, but speak even if we can't
+    const voice = getVoice()
+    if (voice) { u.voice = voice; u.lang = voice.lang }
+
+    u.onstart = () => { speakingRef.current = true; setIsSpeaking(true); setIsPaused(false) }
+    u.onend = () => { speakingRef.current = false; setIsSpeaking(false); setIsPaused(false) }
+    u.onerror = (e) => { console.error('TTS error:', e); speakingRef.current = false; setIsSpeaking(false); setIsPaused(false) }
+
+    utteranceRef.current = u
+    window.speechSynthesis.speak(u)
   }, [language, rate, getVoice, isSupported])
 
   const pause = useCallback(() => { if (isSupported) { window.speechSynthesis.pause(); setIsPaused(true) } }, [isSupported])
