@@ -11,36 +11,28 @@ const LANG_CODES = {
   Gujarati: 'gu-IN',
 }
 
-function getVoicesAsync() {
-  return new Promise((resolve) => {
-    const voices = window.speechSynthesis.getVoices()
-    if (voices.length > 0) {
-      resolve(voices)
-      return
-    }
-    // Chrome loads voices async — wait for them
-    const onVoicesChanged = () => {
-      const v = window.speechSynthesis.getVoices()
-      if (v.length > 0) {
-        window.speechSynthesis.removeEventListener('voiceschanged', onVoicesChanged)
-        resolve(v)
-      }
-    }
-    window.speechSynthesis.addEventListener('voiceschanged', onVoicesChanged)
-    // Timeout fallback — resolve with empty after 3s
-    setTimeout(() => resolve(window.speechSynthesis.getVoices()), 3000)
-  })
-}
-
 export default function useSpeechSynthesis(language = 'English') {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
   const [rate, setRate] = useState(1)
+  const voicesRef = useRef([])
   const resumeTimer = useRef(null)
 
   const isSupported = typeof window !== 'undefined' && 'speechSynthesis' in window
 
-  // Chrome Mac bug: speech gets stuck after ~15s. Periodic resume fixes it.
+  // Load voices eagerly on mount — so they're ready when speak is called
+  useEffect(() => {
+    if (!isSupported) return
+    const load = () => {
+      const v = window.speechSynthesis.getVoices()
+      if (v.length > 0) voicesRef.current = v
+    }
+    load()
+    window.speechSynthesis.addEventListener('voiceschanged', load)
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', load)
+  }, [isSupported])
+
+  // Chrome Mac keep-alive hack
   const startKeepAlive = useCallback(() => {
     if (resumeTimer.current) clearInterval(resumeTimer.current)
     resumeTimer.current = setInterval(() => {
@@ -57,14 +49,16 @@ export default function useSpeechSynthesis(language = 'English') {
 
   useEffect(() => () => stopKeepAlive(), [stopKeepAlive])
 
-  const speak = useCallback(async (text) => {
+  // SYNCHRONOUS speak — no async, no await, works in click handlers on all browsers
+  const speak = useCallback((text) => {
     if (!isSupported || !text) return
 
     const synth = window.speechSynthesis
-    synth.cancel()
 
-    // Wait for voices to be available (critical for Chrome Mac)
-    const voices = await getVoicesAsync()
+    // If voices aren't loaded yet, try one more time
+    if (voicesRef.current.length === 0) {
+      voicesRef.current = synth.getVoices()
+    }
 
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = LANG_CODES[language] || 'en-US'
@@ -72,16 +66,16 @@ export default function useSpeechSynthesis(language = 'English') {
     utterance.pitch = 1.1
 
     // Pick a female voice
+    const voices = voicesRef.current
     if (voices.length > 0) {
       const prefix = (LANG_CODES[language] || 'en-US').split('-')[0]
       const female = voices.find(v =>
         v.lang.startsWith(prefix) &&
-        !/\b(ravi|hemant|david|james|rishi|kumar|raj|male|daniel|thomas|george|aaron|fred)\b/i.test(v.name)
+        !/\b(ravi|hemant|david|james|rishi|kumar|raj|male|daniel|thomas|george|aaron|fred|albert)\b/i.test(v.name)
       )
       if (female) {
         utterance.voice = female
       } else {
-        // Any voice for this language
         const any = voices.find(v => v.lang.startsWith(prefix))
         if (any) utterance.voice = any
       }
@@ -91,6 +85,7 @@ export default function useSpeechSynthesis(language = 'English') {
     utterance.onend = () => { setIsSpeaking(false); setIsPaused(false); stopKeepAlive() }
     utterance.onerror = () => { setIsSpeaking(false); setIsPaused(false); stopKeepAlive() }
 
+    // DO NOT call cancel() before speak on Mac Chrome — it kills the user gesture
     synth.speak(utterance)
   }, [language, rate, isSupported, startKeepAlive, stopKeepAlive])
 
