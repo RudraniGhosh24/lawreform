@@ -21,9 +21,8 @@ export default function useSpeechSynthesis(language = 'English') {
   const speak = useCallback((text) => {
     if (!isSupported || !text) return
 
-    // Always cancel first, then wait for Chrome to be ready
-    window.speechSynthesis.cancel()
-
+    // Don't cancel — on Mac Chrome, cancel() resets the audio unlock
+    // Instead just let the new utterance queue
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = LANG_CODES[language] || 'en-US'
     utterance.rate = rate || 0.9

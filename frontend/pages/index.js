@@ -72,7 +72,9 @@ export default function Home() {
 
     // CRITICAL: Unlock audio on Mac/mobile Chrome — must happen synchronously in click handler
     if (typeof window !== 'undefined' && window.speechSynthesis) {
-      const u = new SpeechSynthesisUtterance('')
+      window.speechSynthesis.cancel()
+      const u = new SpeechSynthesisUtterance(' ')
+      u.volume = 0.01
       window.speechSynthesis.speak(u)
     }
 
