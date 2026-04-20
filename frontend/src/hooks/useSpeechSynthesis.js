@@ -65,19 +65,25 @@ export default function useSpeechSynthesis(language = 'English') {
     utterance.rate = rate || 0.9
     utterance.pitch = 1.1
 
-    // Pick a female voice
+    // Pick a female voice — prefer Google or Samantha voices
     const voices = voicesRef.current
     if (voices.length > 0) {
       const prefix = (LANG_CODES[language] || 'en-US').split('-')[0]
-      const female = voices.find(v =>
-        v.lang.startsWith(prefix) &&
-        !/\b(ravi|hemant|david|james|rishi|kumar|raj|male|daniel|thomas|george|aaron|fred|albert)\b/i.test(v.name)
-      )
-      if (female) {
-        utterance.voice = female
+      const langVoices = voices.filter(v => v.lang.startsWith(prefix))
+      
+      // Prefer known good female voices
+      const goodNames = ['samantha', 'karen', 'victoria', 'susan', 'fiona', 'moira', 'tessa', 'google', 'microsoft', 'kalpana', 'lekha', 'swati']
+      const good = langVoices.find(v => goodNames.some(n => v.name.toLowerCase().includes(n)))
+      if (good) {
+        utterance.voice = good
       } else {
-        const any = voices.find(v => v.lang.startsWith(prefix))
-        if (any) utterance.voice = any
+        // Pick first non-novelty voice for this language
+        const normal = langVoices.find(v => 
+          !/\b(bad news|bells|boing|bubbles|cellos|good news|hysterical|junior|organ|superstar|trinoids|whisper|wobble|zarvox|albert|ralph|fred)\b/i.test(v.name) &&
+          !/\b(ravi|hemant|david|james|rishi|kumar|raj|daniel|thomas|george|aaron)\b/i.test(v.name)
+        )
+        if (normal) utterance.voice = normal
+        else if (langVoices.length > 0) utterance.voice = langVoices[0]
       }
     }
 
@@ -98,7 +104,12 @@ export default function useSpeechSynthesis(language = 'English') {
   }, [isSupported])
 
   const stop = useCallback(() => {
-    if (isSupported) { window.speechSynthesis.cancel(); setIsSpeaking(false); setIsPaused(false); stopKeepAlive() }
+    if (isSupported) {
+      // Use pause first, then cancel after a tick (Mac Chrome compat)
+      window.speechSynthesis.pause()
+      setTimeout(() => window.speechSynthesis.cancel(), 50)
+      setIsSpeaking(false); setIsPaused(false); stopKeepAlive()
+    }
   }, [isSupported, stopKeepAlive])
 
   return { speak, pause, resume, stop, isSpeaking, isPaused, rate, setRate, isSupported }
