@@ -7,38 +7,21 @@ export default function SpeechPlayer({ text, language }) {
 
   if (!isSupported) return null
 
-  // Convert numbers to English words so TTS doesn't read them in Hindi
-  const numToWords = (n) => {
-    const ones = ['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen']
-    const tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety']
-    const num = parseInt(n)
-    if (isNaN(num)) return n
-    if (num === 0) return 'zero'
-    if (num < 20) return ones[num]
-    if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? ' ' + ones[num%10] : '')
-    if (num < 1000) return ones[Math.floor(num/100)] + ' hundred' + (num%100 ? ' and ' + numToWords(String(num%100)) : '')
-    if (num < 100000) return numToWords(String(Math.floor(num/1000))) + ' thousand' + (num%1000 ? ' ' + numToWords(String(num%1000)) : '')
-    if (num < 10000000) return numToWords(String(Math.floor(num/100000))) + ' lakh' + (num%100000 ? ' ' + numToWords(String(num%100000)) : '')
-    return numToWords(String(Math.floor(num/10000000))) + ' crore' + (num%10000000 ? ' ' + numToWords(String(num%10000000)) : '')
+  const cleanForSpeech = () => {
+    return text
+      .replace(/\[([^\]]+)\]/g, '')
+      .replace(/[*#_~`|→•]/g, '')
+      .replace(/https?:\/\/\S+/g, '')
+      .replace(/\n+/g, '. ')
+      .replace(/\s{2,}/g, ' ')
+      .trim()
   }
-
-  const cleanText = text
-    .replace(/\[([^\]]+)\]/g, '') // Remove citation brackets
-    .replace(/[📜✨→•🔊⏸️⏹️▶️🗣️⚖️🤖🎙️📄📋🚨📝⚙️⏰🤪🏠ℹ️]/gu, '') // Remove emojis
-    .replace(/[*#_~`|]/g, '') // Remove markdown symbols
-    .replace(/https?:\/\/\S+/g, '') // Remove URLs
-    .replace(/₹\s?(\d[\d,]*)/g, (_, n) => 'rupees ' + numToWords(n.replace(/,/g, '')))
-    .replace(/\b(\d[\d,]+)\b/g, (_, n) => numToWords(n.replace(/,/g, ''))) // Convert all numbers to English words
-    .replace(/\n+/g, '. ')
-    .replace(/\s{2,}/g, ' ')
-    .replace(/\.\s*\./g, '.')
-    .trim()
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
       {!isSpeaking ? (
         <button
-          onClick={() => speak(cleanText)}
+          onClick={() => { const t = cleanForSpeech(); if (t) speak(t) }}
           className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 text-xs font-medium hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors min-h-[36px]"
           aria-label="Read aloud"
         >
@@ -51,14 +34,14 @@ export default function SpeechPlayer({ text, language }) {
             className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 text-xs font-medium hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors min-h-[36px]"
             aria-label={isPaused ? 'Resume' : 'Pause'}
           >
-            {isPaused ? '▶️ Resume' : '⏸️ Pause'}
+            {isPaused ? '▶ Resume' : '⏸ Pause'}
           </button>
           <button
             onClick={stop}
             className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-text-muted text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors min-h-[36px]"
             aria-label="Stop"
           >
-            ⏹️ Stop
+            ⏹ Stop
           </button>
         </>
       )}
