@@ -177,8 +177,18 @@ export default function Home() {
 
         <main className="flex-1 flex flex-col overflow-hidden max-w-5xl w-full mx-auto">
           {hasMessages ? (
-            /* ===== CHAT VIEW — avatar scrolls with messages ===== */
-            <ChatWindow messages={messages} language={language} streamingIndex={streamingIndex} isSpeaking={tts.isSpeaking} />
+            <>
+              {/* Tap to hear banner when browser blocked autoplay */}
+              {tts.pendingText && !tts.isSpeaking && (
+                <button
+                  onClick={() => tts.speak(tts.pendingText)}
+                  className="w-full py-2 bg-brand-500 text-white text-sm font-medium text-center animate-pulse"
+                >
+                  🔊 Tap here to hear the response
+                </button>
+              )}
+              <ChatWindow messages={messages} language={language} streamingIndex={streamingIndex} isSpeaking={tts.isSpeaking} />
+            </>
           ) : (
             /* ===== HOME VIEW — compact, content-first ===== */
             <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 sm:py-6 gap-3 sm:gap-4 overflow-y-auto">
