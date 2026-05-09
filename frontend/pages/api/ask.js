@@ -32,9 +32,16 @@ export default async function handler(req, res) {
     ? retrievedChunks.map(c => `[${c.source} — ${c.section}]\n"${c.text}"`).join('\n\n')
     : 'No specific legal provisions found for this query. Provide general guidance about seeking help from DLSA.'
 
-  // === BUILD PROMPT ===
+  // === MODEL SELECTION ===
+  // Priority: Fine-tuned model on HuggingFace > Google AI Studio Gemma
+  const HF_API_KEY = process.env.HF_API_KEY
+  const HF_MODEL = process.env.HF_MODEL // e.g. "RudraniGhosh24/lawreformer-gemma-4b-legal-indian"
+  const useFineTuned = HF_API_KEY && HF_MODEL
+
   const model = process.env.GEMMA_MODEL || 'gemma-3-27b-it'
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
+  const url = useFineTuned
+    ? `https://api-inference.huggingface.co/models/${HF_MODEL}`
+    : `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
 
   const lang = language || 'English'
   const fullPrompt = SYS + ' Respond in ' + lang + '.\n\n--- RETRIEVED LEGAL CONTEXT (from RAG) ---\n' + ragContext + '\n--- END CONTEXT ---\n\nUser question: ' + (question || 'Analyze this document and explain my legal rights.')
@@ -47,34 +54,60 @@ export default async function handler(req, res) {
       parts.push({ inline_data: { mime_type: mimeType, data: base64 } })
     }
 
-    // Build conversation for multi-turn
-    const contents = []
-    if (history && history.length > 0) {
-      contents.push({ role: 'user', parts: [{ text: fullPrompt + '\n\nPrevious context: ' + history[0].content }] })
-      for (let i = 1; i < history.length; i++) {
-        contents.push({ role: history[i].role === 'user' ? 'user' : 'model', parts: [{ text: history[i].content }] })
+    let text = ''
+
+    if (useFineTuned) {
+      // === FINE-TUNED MODEL via HuggingFace Inference API ===
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${HF_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          inputs: fullPrompt,
+          parameters: { max_new_tokens: 1024, temperature: 0.7, top_p: 0.9 },
+        }),
+      })
+      if (!r.ok) {
+        // Fallback to Google AI Studio if HF fails
+        console.error('HF API failed, falling back to Google AI Studio')
+      } else {
+        const data = await r.json()
+        text = data?.[0]?.generated_text || data?.generated_text || ''
+        // Remove the prompt from response if echoed
+        if (text.includes(fullPrompt)) text = text.replace(fullPrompt, '').trim()
       }
-      contents.push({ role: 'user', parts })
-    } else {
-      contents.push({ role: 'user', parts })
     }
 
-    const r = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents,
-        generationConfig: { temperature: 0.7, topP: 0.9, topK: 40, maxOutputTokens: 1500 },
-      }),
-    })
+    if (!text) {
+      // === GOOGLE AI STUDIO (base Gemma or fallback) ===
+      const contents = []
+      if (history && history.length > 0) {
+        contents.push({ role: 'user', parts: [{ text: fullPrompt + '\n\nPrevious context: ' + history[0].content }] })
+        for (let i = 1; i < history.length; i++) {
+          contents.push({ role: history[i].role === 'user' ? 'user' : 'model', parts: [{ text: history[i].content }] })
+        }
+        contents.push({ role: 'user', parts })
+      } else {
+        contents.push({ role: 'user', parts })
+      }
 
-    if (!r.ok) {
-      const t = await r.text()
-      return res.status(502).json({ error: 'Gemma 4 error ' + r.status, detail: t })
+      const googleUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
+      const r = await fetch(googleUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents,
+          generationConfig: { temperature: 0.7, topP: 0.9, topK: 40, maxOutputTokens: 1500 },
+        }),
+      })
+
+      if (!r.ok) {
+        const t = await r.text()
+        return res.status(502).json({ error: 'Gemma 4 error ' + r.status, detail: t })
+      }
+
+      const data = await r.json()
+      text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, no response generated.'
     }
-
-    const data = await r.json()
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, no response generated.'
 
     // Return response + retrieved sources
     res.setHeader('Content-Type', 'text/event-stream')
