@@ -99,6 +99,19 @@ export default function MessageBubble({ message, language, isStreaming }) {
           )}
         </div>
 
+        {/* Retrieved Sources (RAG) */}
+        {!isUser && !isStreaming && message.sources && message.sources.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-brand-100 dark:border-brand-800 space-y-2">
+            <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wide">📚 Retrieved from Legal Database</p>
+            {message.sources.map((src, i) => (
+              <div key={i} className="p-2 rounded-lg bg-brand-50/50 dark:bg-brand-900/10 border border-brand-100 dark:border-brand-800">
+                <p className="text-[10px] font-semibold text-brand-600 dark:text-brand-400">{src.source} — {src.section}</p>
+                <p className="text-[10px] text-text-muted italic mt-0.5">"{src.text}"</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Next steps */}
         {!isUser && !isStreaming && nextSteps.length > 0 && (
           <div className="mt-3 pt-3 border-t border-brand-100 dark:border-brand-800 space-y-2">

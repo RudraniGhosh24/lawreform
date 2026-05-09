@@ -110,13 +110,15 @@ export default function Home() {
               const data = JSON.parse(line.slice(6))
               if (data.token) {
                 fullResponse += data.token
+                // Store sources from RAG
+                const sources = data.sources || []
                 // Typewriter effect — reveal characters gradually
                 const text = fullResponse
                 let charIndex = 0
                 const typewrite = () => {
                   if (charIndex <= text.length) {
-                    setMessages(prev => { const u = [...prev]; u[u.length - 1] = { role: 'assistant', content: text.slice(0, charIndex) }; return u })
-                    charIndex += Math.floor(Math.random() * 3) + 2 // 2-4 chars at a time
+                    setMessages(prev => { const u = [...prev]; u[u.length - 1] = { role: 'assistant', content: text.slice(0, charIndex), sources }; return u })
+                    charIndex += Math.floor(Math.random() * 3) + 2
                     setTimeout(typewrite, 35)
                   }
                 }
