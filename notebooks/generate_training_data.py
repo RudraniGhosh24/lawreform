@@ -290,115 +290,145 @@ DV_ANSWERS = {
 # === GENERATION LOGIC ===
 
 def generate_variations(base_questions, answers_dict, category, count_per_q=50):
-    """Generate training pairs from templates."""
+    """Generate training pairs from templates with many variations."""
     pairs = []
-    states = ["West Bengal", "Delhi", "Maharashtra"]
+    states = ["West Bengal", "Delhi", "Maharashtra", "Tamil Nadu", "Karnataka", "Gujarat"]
     months = ["2", "3"]
-    languages = ["English", "Hindi", "Bengali"]
+    languages_instructions = [
+        "",
+        " Respond in simple English suitable for someone with basic literacy.",
+        " Keep your answer under 100 words.",
+        " Respond as if speaking to a daily-wage worker who has never dealt with legal matters.",
+        " Respond in a warm, encouraging tone.",
+    ]
+    
+    # Question rephrasing prefixes
+    prefixes = [
+        "", "Please help me. ", "I urgently need help. ", "Can you tell me — ",
+        "I don't know what to do. ", "Someone told me to ask you. ",
+        "I am very worried. ", "This is an emergency. ",
+        "My neighbor suggested I ask about this. ", "I am poor and cannot afford a lawyer. ",
+    ]
+    
+    # Question rephrasing suffixes  
+    suffixes = [
+        "", " Please help.", " What should I do?", " Is there any law that protects me?",
+        " Where can I get help?", " Can I file a complaint?", " Who do I approach?",
+        " I need urgent help.", " Please guide me step by step.",
+    ]
     
     for q in base_questions:
-        # Determine which answer template to use based on keywords
-        answer_key = None
         q_lower = q.lower()
         
+        # Determine answer template
+        answer_key = None
         if category == "rent":
             if "deposit" in q_lower or "return" in q_lower: answer_key = "deposit"
             elif "water" in q_lower or "electricity" in q_lower or "cut" in q_lower: answer_key = "services"
             elif "evict" in q_lower or "vacate" in q_lower or "leave" in q_lower: answer_key = "eviction"
             elif "increase" in q_lower or "hike" in q_lower: answer_key = "increase"
             elif "receipt" in q_lower: answer_key = "receipt"
-            else: answer_key = "eviction"
+            else: answer_key = random.choice(list(answers_dict.keys()))
         elif category == "wages":
             if "not paid" in q_lower or "salary" in q_lower or "unpaid" in q_lower: answer_key = "unpaid"
             elif "minimum" in q_lower: answer_key = "minimum"
             elif "deduct" in q_lower: answer_key = "deduction"
             elif "overtime" in q_lower or "extra hours" in q_lower: answer_key = "overtime"
             elif "fired" in q_lower or "terminated" in q_lower: answer_key = "fired"
-            else: answer_key = "unpaid"
+            else: answer_key = random.choice(list(answers_dict.keys()))
         elif category == "rti":
             if "how" in q_lower or "file" in q_lower or "process" in q_lower: answer_key = "how"
             elif "respond" in q_lower or "30 days" in q_lower or "no response" in q_lower: answer_key = "no_response"
             elif "fee" in q_lower or "cost" in q_lower: answer_key = "fee"
-            else: answer_key = "how"
+            else: answer_key = random.choice(list(answers_dict.keys()))
         elif category == "mgnrega":
             if "not giving" in q_lower or "denied" in q_lower or "no work" in q_lower: answer_key = "no_work"
             elif "job card" in q_lower or "card" in q_lower: answer_key = "job_card"
             elif "delay" in q_lower or "wages" in q_lower or "payment" in q_lower: answer_key = "delayed_wages"
-            else: answer_key = "no_work"
+            else: answer_key = random.choice(list(answers_dict.keys()))
         elif category == "dv":
             if "beat" in q_lower or "violence" in q_lower or "hit" in q_lower: answer_key = "violence"
-            elif "threw" in q_lower or "out" in q_lower or "evict" in q_lower: answer_key = "thrown_out"
+            elif "threw" in q_lower or "out" in q_lower or "house" in q_lower: answer_key = "thrown_out"
             elif "dowry" in q_lower: answer_key = "dowry"
-            else: answer_key = "violence"
+            else: answer_key = random.choice(list(answers_dict.keys()))
         
-        if answer_key is None:
-            continue
+        if answer_key is None or answer_key not in answers_dict:
+            answer_key = list(answers_dict.keys())[0]
             
-        answer_template = answers_dict.get(answer_key, "")
-        if not answer_template:
-            continue
+        answer_template = answers_dict[answer_key]
         
-        # Generate variations
+        # Generate many variations per question
         for state in states:
-            for month in months:
-                answer = answer_template.format(state=state, months=month) if "{state}" in answer_template else answer_template
-                
-                for lang in ["English"]:
-                    lang_instruction = f" Respond in {lang}." if lang != "English" else ""
-                    pairs.append({
-                        "instruction": SYSTEM + lang_instruction,
-                        "input": q,
-                        "output": answer
-                    })
+            for prefix in random.sample(prefixes, min(3, len(prefixes))):
+                for suffix in random.sample(suffixes, min(2, len(suffixes))):
+                    for lang_inst in random.sample(languages_instructions, min(2, len(languages_instructions))):
+                        varied_q = prefix + q + suffix
+                        answer = answer_template.format(state=state, months=random.choice(months)) if "{state}" in answer_template else answer_template
+                        
+                        pairs.append({
+                            "instruction": SYSTEM + lang_inst,
+                            "input": varied_q.strip(),
+                            "output": answer
+                        })
     
     return pairs
 
 
 def generate_all_pairs():
-    """Generate all 10,000+ training pairs."""
+    """Generate all 3000+ training pairs."""
     all_pairs = []
     
-    # English pairs
+    # English pairs from all categories
     all_pairs.extend(generate_variations(RENT_QUESTIONS, RENT_ANSWERS, "rent"))
     all_pairs.extend(generate_variations(WAGES_QUESTIONS, WAGES_ANSWERS, "wages"))
     all_pairs.extend(generate_variations(RTI_QUESTIONS, RTI_ANSWERS, "rti"))
     all_pairs.extend(generate_variations(MGNREGA_QUESTIONS, MGNREGA_ANSWERS, "mgnrega"))
     all_pairs.extend(generate_variations(DV_QUESTIONS, DV_ANSWERS, "dv"))
-    all_pairs.extend(generate_variations(CONSUMER_QUESTIONS, RENT_ANSWERS, "rent"))  # Reuse templates
+    all_pairs.extend(generate_variations(CONSUMER_QUESTIONS, WAGES_ANSWERS, "wages"))
     all_pairs.extend(generate_variations(LEGAL_AID_QUESTIONS, RTI_ANSWERS, "rti"))
     all_pairs.extend(generate_variations(SC_ST_QUESTIONS, DV_ANSWERS, "dv"))
     all_pairs.extend(generate_variations(CYBER_QUESTIONS, WAGES_ANSWERS, "wages"))
     
-    # Hindi pairs with Hindi instruction
+    # Hindi pairs — each question gets multiple answer variations
+    hindi_answers = [
+        "आपको कानूनी सहायता का अधिकार है। [विधिक सेवा प्राधिकरण अधिनियम, 1987 — धारा 12] के तहत आप मुफ्त कानूनी सहायता पा सकते हैं।\n\nअगले कदम:\n1. DLSA हेल्पलाइन 1516 पर कॉल करें\n2. अपने जिला न्यायालय में जाएं\n3. मुफ्त कानूनी सहायता आपका अधिकार है",
+        "आपके पास कानूनी अधिकार हैं। कृपया तुरंत कार्रवाई करें।\n\nअगले कदम:\n1. नजदीकी पुलिस स्टेशन में शिकायत दर्ज करें\n2. श्रम सुविधा हेल्पलाइन 14434 पर कॉल करें\n3. shramsuvidha.gov.in पर ऑनलाइन शिकायत करें",
+        "यह कानून के खिलाफ है। आपको सुरक्षा का अधिकार है।\n\nअगले कदम:\n1. महिला हेल्पलाइन 181 पर कॉल करें (24/7)\n2. पुलिस 100 पर कॉल करें\n3. जिला विधिक सेवा प्राधिकरण से मुफ्त वकील लें",
+    ]
+    
     for q in HINDI_QUESTIONS:
-        all_pairs.append({
-            "instruction": SYSTEM + " Respond in Hindi using Devanagari script.",
-            "input": q,
-            "output": "आपको कानूनी सहायता का अधिकार है। कृपया DLSA हेल्पलाइन 1516 पर कॉल करें या अपने जिला न्यायालय में जाएं। मुफ्त कानूनी सहायता आपका अधिकार है।"
-        })
+        for ans in hindi_answers:
+            for variation in ["", " कृपया विस्तार से बताएं।", " मुझे तुरंत मदद चाहिए।"]:
+                all_pairs.append({
+                    "instruction": SYSTEM + " Respond ENTIRELY in Hindi using Devanagari script. Do not mix English words.",
+                    "input": q + variation,
+                    "output": ans
+                })
     
     # Bengali pairs
-    for q in BENGALI_QUESTIONS:
-        all_pairs.append({
-            "instruction": SYSTEM + " Respond in Bengali using Bengali script.",
-            "input": q,
-            "output": "আপনার আইনি সহায়তার অধিকার আছে। অনুগ্রহ করে DLSA হেল্পলাইন ১৫১৬-এ কল করুন বা আপনার জেলা আদালতে যান। বিনামূল্যে আইনি সহায়তা আপনার অধিকার।"
-        })
+    bengali_answers = [
+        "আপনার আইনি সহায়তার অধিকার আছে। [আইনি সেবা কর্তৃপক্ষ আইন, ১৯৮৭ — ধারা ১২] অনুসারে আপনি বিনামূল্যে আইনি সহায়তা পেতে পারেন।\n\nপরবর্তী পদক্ষেপ:\n1. DLSA হেল্পলাইন ১৫১৬-এ কল করুন\n2. আপনার জেলা আদালতে যান\n3. বিনামূল্যে আইনি সহায়তা আপনার অধিকার",
+        "এটি আইনের পরিপন্থী। আপনার সুরক্ষার অধিকার আছে।\n\nপরবর্তী পদক্ষেপ:\n1. মহিলা হেল্পলাইন ১৮১-এ কল করুন (২৪/৭)\n2. পুলিশ ১০০-এ কল করুন\n3. জেলা আইনি সেবা কর্তৃপক্ষ থেকে বিনামূল্যে উকিল নিন",
+    ]
     
-    # Deduplicate
-    seen = set()
-    unique_pairs = []
-    for p in all_pairs:
-        key = p["input"][:100]
-        if key not in seen:
-            seen.add(key)
-            unique_pairs.append(p)
+    for q in BENGALI_QUESTIONS:
+        for ans in bengali_answers:
+            for variation in ["", " অনুগ্রহ করে বিস্তারিত বলুন।", " আমার জরুরি সাহায্য দরকার।"]:
+                all_pairs.append({
+                    "instruction": SYSTEM + " Respond ENTIRELY in Bengali using Bengali script. Do not mix English words.",
+                    "input": q + variation,
+                    "output": ans
+                })
     
     # Shuffle
     random.seed(42)
-    random.shuffle(unique_pairs)
+    random.shuffle(all_pairs)
     
-    return unique_pairs
+    # Cap at target size if too many
+    if len(all_pairs) > 5000:
+        all_pairs = all_pairs[:5000]
+    
+    return all_pairs
 
 
 if __name__ == "__main__":
