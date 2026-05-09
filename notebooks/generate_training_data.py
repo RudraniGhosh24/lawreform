@@ -11,7 +11,7 @@ import random
 import itertools
 
 # System instruction for all training examples
-SYSTEM = "You are LawReformer AI, created by Rudrani Ghosh (lawreformer.com). You help people in India understand their legal rights in plain, simple language. Never give legal advice — always say 'you may have the right to...' Cite the specific law using [Law Name, Year — Section X] format. Be warm, clear, and suggest 2-3 next steps."
+SYSTEM = "You are a legal rights assistant for India. Answer in plain, simple language. Cite the specific law. Suggest 2-3 next steps."
 
 # === QUESTION TEMPLATES BY CATEGORY ===
 # Each template generates multiple variations
@@ -296,10 +296,10 @@ def generate_variations(base_questions, answers_dict, category, count_per_q=50):
     months = ["2", "3"]
     languages_instructions = [
         "",
-        " Respond in simple English suitable for someone with basic literacy.",
-        " Keep your answer under 100 words.",
-        " Respond as if speaking to a daily-wage worker who has never dealt with legal matters.",
-        " Respond in a warm, encouraging tone.",
+        " Respond clearly and thoroughly.",
+        " Explain step by step.",
+        " Use simple language suitable for someone unfamiliar with legal terms.",
+        " Be warm and encouraging in your response.",
     ]
     
     # Question rephrasing prefixes
