@@ -38,7 +38,7 @@ export default async function handler(req, res) {
   const HF_MODEL = process.env.HF_MODEL // e.g. "RudraniGhosh24/lawreformer-gemma-4b-legal-indian"
   const useFineTuned = HF_API_KEY && HF_MODEL
 
-  const model = process.env.GEMMA_MODEL || 'gemma-3-27b-it'
+  const model = process.env.GEMMA_MODEL || 'gemma-3-12b-it'
   const url = useFineTuned
     ? `https://api-inference.huggingface.co/models/${HF_MODEL}`
     : `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
