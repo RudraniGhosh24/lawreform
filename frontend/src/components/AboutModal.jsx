@@ -39,7 +39,7 @@ export default function AboutModal({ isOpen, onClose }) {
 
           <p>
             This tool was submitted to the{' '}
-            <strong className="text-text dark:text-white">Kaggle AI for Good Hackathon 2026</strong> under the
+            <strong className="text-text dark:text-white">Kaggle Hackathon 2026</strong> under the
             Digital Equity &amp; Inclusivity track.
           </p>
 

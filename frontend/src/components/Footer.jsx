@@ -14,7 +14,7 @@ export default function Footer() {
         </a>
         {' for '}
         <a href="https://www.kaggle.com/competitions/gemma-4-good-hackathon" target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline">
-          The AI for Good Hackathon
+          Kaggle Hackathon
         </a>
         {' · '}
         <a href="https://github.com/RudraniGhosh24/lawreform" target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline">
