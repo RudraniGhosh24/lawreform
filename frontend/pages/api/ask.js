@@ -97,7 +97,7 @@ export default async function handler(req, res) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents,
-          generationConfig: { temperature: 0.7, topP: 0.9, topK: 40, maxOutputTokens: 1500 },
+          generationConfig: { temperature: 0.7, topP: 0.9, topK: 40, maxOutputTokens: 1500, thinkingConfig: { thinkingBudget: 0 } },
         }),
       })
 
@@ -107,7 +107,13 @@ export default async function handler(req, res) {
       }
 
       const data = await r.json()
-      text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, no response generated.'
+      // Get the last text part (skip thinking parts if present)
+      const parts_resp = data?.candidates?.[0]?.content?.parts || []
+      const textParts = parts_resp.filter(p => p.text && !p.thought)
+      text = (textParts.length > 0 ? textParts[textParts.length - 1].text : parts_resp[0]?.text) || 'Sorry, no response generated.'
+      // Strip any remaining reasoning markers
+      text = text.replace(/^\s*\*[^*]+\*\s*/gm, '').replace(/^[\s*•-]+(?:User|Goal|Context|Persona|Constraint|Strategy|Drafting|Self-Correction|Problem|Crucial|Wait|Note|Refined|Final|Help|Looking|Since|However|Let).*$/gm, '').trim()
+      if (!text || text.length < 20) text = parts_resp.map(p => p.text).filter(Boolean).join('\n').replace(/^\s*\*[^*]+\*\s*/gm, '').trim()
     }
 
     // Return response + retrieved sources
