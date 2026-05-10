@@ -97,7 +97,7 @@ export default async function handler(req, res) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents,
-          generationConfig: { temperature: 0.7, topP: 0.9, topK: 40, maxOutputTokens: 1500, thinkingConfig: { thinkingBudget: 0 } },
+          generationConfig: { temperature: 0.7, topP: 0.9, topK: 40, maxOutputTokens: 1500 },
         }),
       })
 
