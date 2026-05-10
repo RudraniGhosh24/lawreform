@@ -177,7 +177,7 @@ export default function Home() {
                 <span className="text-xs font-medium text-brand-700 dark:text-brand-300">
                   {{ English: 'AI Legal Rights Assistant', Hindi: 'AI कानूनी सहायक', Bengali: 'AI আইনি সহায়ক', Tamil: 'AI சட்ட உதவியாளர்', Telugu: 'AI చట్ట సహాయకుడు', Marathi: 'AI कायदेशीर सहाय्यक', Kannada: 'AI ಕಾನೂನು ಸಹಾಯಕ', Gujarati: 'AI કાનૂની સહાયક' }[language] || 'AI Legal Rights Assistant'}
                 </span>
-                <span className="text-[9px] bg-brand-200 dark:bg-brand-800 text-brand-800 dark:text-brand-200 px-1.5 py-0.5 rounded-full font-medium">Gemma 4</span>
+                <span className="text-[9px] bg-brand-200 dark:bg-brand-800 text-brand-800 dark:text-brand-200 px-1.5 py-0.5 rounded-full font-medium">AI</span>
               </div>
 
               {/* Language selector — visible on main screen */}

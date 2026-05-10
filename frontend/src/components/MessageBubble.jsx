@@ -116,7 +116,7 @@ export default function MessageBubble({ message, language, isStreaming }) {
           <div className="mt-2 pt-2 border-t border-brand-50 dark:border-brand-900 flex items-center justify-between flex-wrap gap-2">
             <SpeechPlayer text={message.content} language={language} />
             <span className="inline-flex items-center gap-1 text-[10px] text-text-light bg-gray-100 dark:bg-brand-900/30 px-2 py-1 rounded-full">
-              ✨ Powered by Gemma 4
+              ✨ AI-Powered
             </span>
           </div>
         )}

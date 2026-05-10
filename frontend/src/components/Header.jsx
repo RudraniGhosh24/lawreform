@@ -55,7 +55,7 @@ export default function Header({ language, setLanguage, onAboutClick, darkMode, 
             </div>
 
             <div className="px-4 py-3 border-t border-brand-100 dark:border-brand-900 text-[10px] text-text-light">
-              Powered by Gemma 4 · Built by Rudrani Ghosh
+              AI-Powered · Built by Rudrani Ghosh
             </div>
           </nav>
         </div>

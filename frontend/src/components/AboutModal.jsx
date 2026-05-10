@@ -39,19 +39,19 @@ export default function AboutModal({ isOpen, onClose }) {
 
           <p>
             This tool was submitted to the{' '}
-            <strong className="text-text dark:text-white">Kaggle Gemma 4 Good Hackathon 2026</strong> under the
+            <strong className="text-text dark:text-white">Kaggle AI for Good Hackathon 2026</strong> under the
             Digital Equity &amp; Inclusivity track.
           </p>
 
           <p>
             It helps people in India who cannot afford lawyers understand their
             legal rights in plain language — using voice input in English, Hindi,
-            and Bengali, powered by Gemma 4 and grounded in real Indian law.
+            and Bengali, powered by AI and grounded in real Indian law.
           </p>
 
           <div className="pt-2 border-t border-brand-100 dark:border-brand-800">
             <p className="text-xs text-text-light">
-              Powered by Gemma 4 · RAG with ChromaDB · Web Speech API
+              AI-Powered · RAG · Web Speech API
             </p>
             <p className="text-xs text-text-light mt-1">
               Website:{' '}

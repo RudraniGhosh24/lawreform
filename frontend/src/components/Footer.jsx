@@ -14,7 +14,7 @@ export default function Footer() {
         </a>
         {' for '}
         <a href="https://www.kaggle.com/competitions/gemma-4-good-hackathon" target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline">
-          The Gemma 4 Good Hackathon
+          The AI for Good Hackathon
         </a>
         {' · '}
         <a href="https://github.com/RudraniGhosh24/lawreform" target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline">
@@ -22,7 +22,7 @@ export default function Footer() {
         </a>
       </p>
       <p className="text-[9px] text-text-light mt-1">
-        Uses Gemma model for AI features. Gemma is a trademark of Google LLC.
+        AI-powered legal information assistant.
       </p>
     </footer>
   )
