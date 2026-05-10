@@ -41,33 +41,19 @@ function extractNextSteps(text) {
 }
 
 function renderMarkdown(text) {
-  // Split by **bold** and *italic* patterns and render as React elements
+  // Render **bold** and *italic* as React elements
   const parts = []
-  let remaining = text
+  // First pass: replace **bold** with <strong>
+  const segments = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/)
   let key = 0
 
-  while (remaining.length > 0) {
-    // Match **bold** first
-    const boldMatch = remaining.match(/\*\*(.+?)\*\*/)
-    // Match *italic*
-    const italicMatch = remaining.match(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/)
-
-    const boldIdx = boldMatch ? remaining.indexOf(boldMatch[0]) : Infinity
-    const italicIdx = italicMatch ? remaining.indexOf(italicMatch[0]) : Infinity
-
-    if (boldIdx === Infinity && italicIdx === Infinity) {
-      parts.push(remaining)
-      break
-    }
-
-    if (boldIdx <= italicIdx && boldMatch) {
-      if (boldIdx > 0) parts.push(remaining.slice(0, boldIdx))
-      parts.push(<strong key={key++} className="font-semibold">{boldMatch[1]}</strong>)
-      remaining = remaining.slice(boldIdx + boldMatch[0].length)
-    } else if (italicMatch) {
-      if (italicIdx > 0) parts.push(remaining.slice(0, italicIdx))
-      parts.push(<em key={key++}>{italicMatch[1]}</em>)
-      remaining = remaining.slice(italicIdx + italicMatch[0].length)
+  for (const seg of segments) {
+    if (seg.startsWith('**') && seg.endsWith('**')) {
+      parts.push(<strong key={key++} className="font-semibold">{seg.slice(2, -2)}</strong>)
+    } else if (seg.startsWith('*') && seg.endsWith('*') && seg.length > 2) {
+      parts.push(<em key={key++}>{seg.slice(1, -1)}</em>)
+    } else {
+      parts.push(seg)
     }
   }
 

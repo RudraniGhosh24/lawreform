@@ -10,6 +10,7 @@ import DocumentUpload from '../src/components/DocumentUpload'
 import Avatar from '../src/components/Avatar'
 import useSpeechRecognition from '../src/hooks/useSpeechRecognition'
 import useSpeechSynthesis from '../src/hooks/useSpeechSynthesis'
+import LanguageSelector from '../src/components/LanguageSelector'
 
 const DISCLAIMER = {
   English: 'Legal information only, not legal advice. For serious matters, contact your DLSA — free legal aid is your right.',
@@ -178,6 +179,9 @@ export default function Home() {
                 </span>
                 <span className="text-[9px] bg-brand-200 dark:bg-brand-800 text-brand-800 dark:text-brand-200 px-1.5 py-0.5 rounded-full font-medium">Gemma 4</span>
               </div>
+
+              {/* Language selector — visible on main screen */}
+              <LanguageSelector language={language} setLanguage={setLanguage} />
 
               {/* Heading */}
               <div className="text-center space-y-1">
