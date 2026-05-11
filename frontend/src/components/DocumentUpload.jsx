@@ -8,16 +8,40 @@ export default function DocumentUpload({ onUpload, disabled }) {
   const handleFile = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (file.size > 4 * 1024 * 1024) {
-      alert('File too large. Please upload an image under 4MB.')
+    if (file.size > 20 * 1024 * 1024) {
+      alert('File too large. Please upload an image under 20MB.')
       return
     }
-    const reader = new FileReader()
-    reader.onload = () => {
-      onUpload(reader.result, file.name)
-      setShowOptions(false)
+
+    // Compress image if larger than 3MB
+    if (file.size > 3 * 1024 * 1024) {
+      const img = new Image()
+      const canvas = document.createElement('canvas')
+      const url = URL.createObjectURL(file)
+      img.onload = () => {
+        const maxDim = 1600
+        let w = img.width, h = img.height
+        if (w > maxDim || h > maxDim) {
+          if (w > h) { h = (h * maxDim) / w; w = maxDim }
+          else { w = (w * maxDim) / h; h = maxDim }
+        }
+        canvas.width = w
+        canvas.height = h
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+        const compressed = canvas.toDataURL('image/jpeg', 0.7)
+        URL.revokeObjectURL(url)
+        onUpload(compressed, file.name)
+        setShowOptions(false)
+      }
+      img.src = url
+    } else {
+      const reader = new FileReader()
+      reader.onload = () => {
+        onUpload(reader.result, file.name)
+        setShowOptions(false)
+      }
+      reader.readAsDataURL(file)
     }
-    reader.readAsDataURL(file)
     e.target.value = ''
   }
 
