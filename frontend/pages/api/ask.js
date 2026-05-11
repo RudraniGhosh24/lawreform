@@ -45,7 +45,8 @@ export default async function handler(req, res) {
     : `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
 
   const lang = language || 'English'
-  const fullPrompt = SYS + ' Respond in ' + lang + '.\n\n--- RETRIEVED LEGAL CONTEXT (from RAG) ---\n' + ragContext + '\n--- END CONTEXT ---\n\nUser question: ' + (question || 'Analyze this document and explain my legal rights.')
+  const userQ = question || (image ? 'I have uploaded a legal document. Please read it carefully and explain: what type of document this is, what are the key terms and clauses, what rights and obligations it creates, and any red flags or unfair terms I should be aware of.' : 'Help me understand my legal rights.')
+  const fullPrompt = SYS + ' Respond in ' + lang + '.\n\n--- RETRIEVED LEGAL CONTEXT (from RAG) ---\n' + ragContext + '\n--- END CONTEXT ---\n\nUser question: ' + userQ
 
   try {
     const parts = [{ text: fullPrompt }]
