@@ -112,3 +112,7 @@ Built by **Rudrani Ghosh** — Indian developer building tools for legal access.
 Website: [lawreformer.com](https://lawreformer.com)  
 Live Demo: [ai.lawreformer.com](https://ai.lawreformer.com)  
 Code: [github.com/RudraniGhosh24/lawreform](https://github.com/RudraniGhosh24/lawreform)
+
+## License
+
+This project is released under the **Attribution 4.0 International (CC BY 4.0)** license. You are free to share and adapt this work with appropriate credit.
